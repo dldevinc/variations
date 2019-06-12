@@ -24,12 +24,13 @@ VERSION = '0.0.2'
 REQUIRED = [
     'Pillow >= 5.2.0',
     'pilkit >= 1.1.6',
-    'face_recognition >= 1.0.0',
 ]
 
 # What packages are optional?
 EXTRAS = {
-
+    'optional': [
+        'face_recognition',
+    ],
 }
 
 # The rest you shouldn't have to touch too much :)

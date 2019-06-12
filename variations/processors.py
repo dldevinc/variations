@@ -1,5 +1,4 @@
-import numpy
-import face_recognition
+import logging
 from pilkit.lib import Image, ImageColor
 from pilkit.processors import ResizeToFill
 
@@ -54,6 +53,13 @@ class FaceDetectionResizeToFill(ResizeToFill):
 
     def process(self, img):
         if self.face_detection is False:
+            return super().process(img)
+
+        try:
+            import numpy
+            import face_recognition
+        except ImportError:
+            logging.warning('face_recognition not installed')
             return super().process(img)
 
         original_anchor = self.anchor
