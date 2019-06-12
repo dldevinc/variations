@@ -6,16 +6,15 @@ from pilkit.utils import save_image
 from .scaler import Scaler
 from . import conf
 from . import utils
-
-AUTO_FORMAT = 'AUTO'
+from .processors import FaceDetectionResizeToFill
 
 
 class Variation:
     logger = logging.getLogger('variations')
 
-    def __init__(self, size, max_width=0, max_height=0,
-            clip=True, upscale=False, anchor=processors.Anchor.CENTER,
-            format=AUTO_FORMAT, preprocessors=None, postprocessors=None, **kwargs):
+    def __init__(self, size, max_width=0, max_height=0, clip=True, upscale=False,
+            anchor=processors.Anchor.CENTER, face_detection=False, format=conf.AUTO_FORMAT,
+            preprocessors=None, postprocessors=None, **kwargs):
         """
         :type size: tuple|list
         :type max_width: int | float
@@ -23,6 +22,7 @@ class Variation:
         :type clip: bool
         :type upscale: bool
         :type anchor: str | tuple | list
+        :type face_detection: bool
         :type format: str
         :type preprocessors: list
         :type postprocessors: list
@@ -32,6 +32,7 @@ class Variation:
         self.upscale = upscale
         self.max_width = max_width
         self.max_height = max_height
+        self.face_detection = face_detection
         self.anchor = anchor
         self.format = format
         self.preprocessors = preprocessors
@@ -138,6 +139,16 @@ class Variation:
         self._max_height = value
 
     @property
+    def face_detection(self):
+        return self._face_detection
+
+    @face_detection.setter
+    def face_detection(self, value):
+        if not isinstance(value, bool):
+            raise TypeError(value)
+        self._face_detection = value
+
+    @property
     def anchor(self):
         return self._anchor
 
@@ -171,7 +182,7 @@ class Variation:
             raise TypeError('"format" must be a string')
 
         value = value.upper()
-        if value != AUTO_FORMAT and value not in Image.EXTENSION.values():
+        if value != conf.AUTO_FORMAT and value not in Image.EXTENSION.values():
             raise ValueError('unsupported format: %s' % value)
         self._format = value
 
@@ -269,11 +280,12 @@ class Variation:
         """
         canvas_size = self.get_output_size(size)
         if self.clip:
-            proc = processors.ResizeToFill(
+            proc = FaceDetectionResizeToFill(
                 width=canvas_size[0],
                 height=canvas_size[1],
                 anchor=self.anchor,
-                upscale=self._upscale
+                upscale=self._upscale,
+                face_detection=self.face_detection
             )
         else:
             proc = processors.ResizeToFit(
@@ -303,8 +315,8 @@ class Variation:
         :type path: str
         :rtype: str
         """
-        format = self.format or AUTO_FORMAT
-        if format == AUTO_FORMAT:
+        format = self.format or conf.AUTO_FORMAT
+        if format == conf.AUTO_FORMAT:
             format = utils.guess_format(path) or conf.DEFAULT_FORMAT
         return format
 

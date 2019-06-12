@@ -1,5 +1,5 @@
-# ajax-views
-A simple interface tyhat allows to process images.
+# variations
+A simple interface that allows to process images.
 
 ## Compatibility
 * `python` >= 3.4
@@ -10,6 +10,3 @@ A simple interface tyhat allows to process images.
 
     ``pip install pilkit``
 3. Run ``pip install variations``
-
-
-.. _`Pillow`: 
