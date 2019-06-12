@@ -23,7 +23,8 @@ VERSION = '0.0.1'
 # What packages are required for this module to be executed?
 REQUIRED = [
     'Pillow >= 5.2.0',
-    'pilkit >= 1.1.6'
+    'pilkit >= 1.1.6',
+    'face_recognition >= 1.0.0',
 ]
 
 # What packages are optional?
