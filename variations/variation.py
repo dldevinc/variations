@@ -39,6 +39,13 @@ class Variation:
         self.postprocessors = postprocessors
         self.extra_context = kwargs
 
+        # check face_recognizer installed
+        if self.face_detection:
+            try:
+                import face_recognizer
+            except ImportError:
+                self.logger.warning("Cannot use face detection because face_recognizer is not installed.")
+
     @property
     def clip(self):
         return self._clip
