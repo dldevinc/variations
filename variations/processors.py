@@ -1,5 +1,5 @@
 import logging
-from pilkit.lib import Image, ImageColor
+from pilkit.lib import Image, ImageColor, ImageDraw
 from pilkit.processors import ResizeToFill
 
 
@@ -25,7 +25,7 @@ class ColorOverlay(object):
         return img
 
 
-class FaceDetectionResizeToFill(ResizeToFill):
+class ROIDetectionResizeToFill(ResizeToFill):
     """
     Добавление функции определения лиц
     """
@@ -33,14 +33,41 @@ class FaceDetectionResizeToFill(ResizeToFill):
         self.face_detection = face_detection
         super().__init__(*args, **kwargs)
 
-    def _get_new_anchor(self, img, faces_box):
+    def _detect_faces(self, img):
+        try:
+            import numpy
+            import face_recognition
+        except ImportError:
+            logging.warning('Cannot use face detection because face_recognizer is not installed.')
+            return
+
+        if img.mode not in ('RGB', 'L'):
+            clone = img.convert('RGB')
+            image_data = numpy.array(clone)
+        else:
+            image_data = numpy.array(img)
+
+        faces = face_recognition.face_locations(image_data, number_of_times_to_upsample=0)
+        if not faces:
+            return
+
+        rect = list(faces[0])
+        for face in faces[1:]:
+            top, right, bottom, left = face
+            rect[0] = min(rect[0], top)
+            rect[1] = max(rect[1], right)
+            rect[2] = max(rect[2], bottom)
+            rect[3] = min(rect[3], left)
+        return rect[3], rect[0], rect[1], rect[2]   # left, top, right, bottom
+
+    def _get_new_anchor(self, img, roi_rect):
         original_width, original_height = img.size
         ratio = max(float(self.width) / original_width,
                     float(self.height) / original_height)
         new_width, new_height = (int(round(original_width * ratio)),
                                  int(round(original_height * ratio)))
 
-        top, right, bottom, left = faces_box
+        left, top, right, bottom = roi_rect
         x = (left + right) / 2 * ratio
         y = (top + bottom) / 2 * ratio
         anchor_x = 0
@@ -52,37 +79,19 @@ class FaceDetectionResizeToFill(ResizeToFill):
         return anchor_x, anchor_y
 
     def process(self, img):
-        if self.face_detection is False:
+        rect = None
+        if self.face_detection:
+            rect = self._detect_faces(img)
+
+        if rect is None:
             return super().process(img)
 
-        try:
-            import numpy
-            import face_recognition
-        except ImportError:
-            logging.warning('face_recognition not installed')
-            return super().process(img)
-
-        original_anchor = self.anchor
-        if img.mode not in ('RGB', 'L'):
-            clone = img.convert('RGB')
-            image_data = numpy.array(clone)
-        else:
-            image_data = numpy.array(img)
-
-        face_locations = face_recognition.face_locations(image_data, number_of_times_to_upsample=0)
-        if not face_locations:
-            return super().process(img)
-
-        faces_box = list(face_locations[0])
-        for face_location in face_locations[1:]:
-            top, right, bottom, left = face_location
-            faces_box[0] = min(faces_box[0], top)
-            faces_box[1] = max(faces_box[1], right)
-            faces_box[2] = max(faces_box[2], bottom)
-            faces_box[3] = min(faces_box[3], left)
+        # draw = ImageDraw.Draw(img)
+        # draw.rectangle(rect, outline='#FFFF00')
 
         # overwrite anchor
-        self.anchor = self._get_new_anchor(img, faces_box)
+        original_anchor = self.anchor
+        self.anchor = self._get_new_anchor(img, rect)
         result = super().process(img)
         self.anchor = original_anchor
         return result

@@ -6,7 +6,7 @@ from pilkit.utils import save_image
 from .scaler import Scaler
 from . import conf
 from . import utils
-from .processors import FaceDetectionResizeToFill
+from .processors import ROIDetectionResizeToFill
 
 
 class Variation:
@@ -287,7 +287,7 @@ class Variation:
         """
         canvas_size = self.get_output_size(size)
         if self.clip:
-            proc = FaceDetectionResizeToFill(
+            proc = ROIDetectionResizeToFill(
                 width=canvas_size[0],
                 height=canvas_size[1],
                 anchor=self.anchor,

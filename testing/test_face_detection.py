@@ -12,7 +12,7 @@ TARGET_PATH = os.path.join(TEST_IMAGES, 'target')
 class TestFaceDetection(unittest.TestCase):
     def test_faces(self):
         path = os.path.join(TEST_IMAGES, 'faces')
-        for filename in os.listdir(path):
+        for filename in sorted(os.listdir(path)):
             variation = Variation(
                 size=(480, 480),
                 face_detection=True
