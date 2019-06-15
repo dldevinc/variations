@@ -2,10 +2,14 @@ from fractions import Fraction
 
 
 class Scaler:
+    """
+    Вычисляет размеры прямоугольника, сохраняя пропорции
+    """
+
     __slots__ = (
         '_width', '_height',
         '_width_orig', '_height_orig',
-        '_upscale', '_aspect'
+        '_upscale', '_ratio'
     )
 
     def __init__(self, width, height, upscale=False):
@@ -16,7 +20,7 @@ class Scaler:
         """
         self._width = self._width_orig = int(width)
         self._height = self._height_orig = int(height)
-        self._aspect = Fraction(width, height)
+        self._ratio = Fraction(width, height)
         self._upscale = bool(upscale)
 
     def __str__(self):
@@ -34,8 +38,8 @@ class Scaler:
         return round(self._height)
 
     @property
-    def aspect(self):
-        return self._aspect
+    def ratio(self):
+        return self._ratio
 
     def set_width(self, value):
         new_width = value
@@ -43,7 +47,7 @@ class Scaler:
             new_width = min(new_width, self._width_orig)
 
         self._width = new_width
-        self._height = self._width / self._aspect
+        self._height = self._width / self._ratio
         return self
 
     def set_height(self, value):
@@ -52,5 +56,5 @@ class Scaler:
             new_height = min(new_height, self._height_orig)
 
         self._height = new_height
-        self._width = self._height * self._aspect
+        self._width = self._height * self._ratio
         return self

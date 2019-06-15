@@ -1,7 +1,7 @@
 import posixpath
-from PIL import Image
 from collections import namedtuple
 from pilkit import processors, utils
+from pilkit.lib import Image
 
 EXTENSION_MAP = {
     value: key
@@ -112,10 +112,11 @@ def reset_transparency(img, color='#FFFFFF', format=None):
 
 def prepare_image(img, draft_size=None, background_color=None):
     """
-    1) Использование метода Image.draft() для экономии памяти при обработке
-    больших картинок.
-    2) Применение ориентации картинки из EXIF-данных
-    3) Заливка RGB-данных в прозрачных пикселях указанным цветом
+    1) Эффекивно уменьшает изображение методом Image.draft() для экономии памяти
+       при обработке больших картинок.
+    2) Примененяет ориентацию картинки, указанную в EXIF-данных
+    3) Заливка RGB-данных в прозрачных пикселях указанным цветом во избежание
+       артефактов при ресайзе
 
     :type img: PIL.Image.Image
     :type draft_size: list | tuple
@@ -127,6 +128,8 @@ def prepare_image(img, draft_size=None, background_color=None):
         img.draft(img.mode, draft_size)
     if format in {'JPEG', 'TIFF'}:
         img = apply_exif(img)
+
+    # TODO: перепроверить необходимость
     if background_color is not None and img.mode in ('RGBA', 'P'):
         img = reset_transparency(img, background_color, format=format)
     return img

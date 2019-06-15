@@ -1,6 +1,6 @@
 import copy
 import logging
-from PIL import Image
+from pilkit.lib import Image
 from pilkit import processors
 from pilkit.utils import save_image
 from .scaler import Scaler
@@ -262,8 +262,8 @@ class Variation:
             if self._upscale:
                 if max_width:
                     if max_height:
-                        max_aspect = max_width / max_height
-                        if size.aspect > max_aspect:
+                        max_aspect_ratio = max_width / max_height
+                        if size.ratio > max_aspect_ratio:
                             size.set_width(max_width)
                         else:
                             size.set_height(max_height)
