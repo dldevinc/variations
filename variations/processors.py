@@ -38,7 +38,7 @@ class ROIDetectionResizeToFill(ResizeToFill):
             import numpy
             import face_recognition
         except ImportError:
-            logging.warning('Cannot use face detection because face_recognizer is not installed.')
+            logging.warning("Cannot use face detection because 'face_recognition' is not installed.")
             return
 
         if img.mode not in ('RGB', 'L'):
