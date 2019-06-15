@@ -95,3 +95,24 @@ class ROIDetectionResizeToFill(ResizeToFill):
         result = super().process(img)
         self.anchor = original_anchor
         return result
+
+
+class MakeOpaque(object):
+    """
+    В отличие от pilkit.processors.MakeOpaque, работает с изображениями в любых
+    режимах, включая RGB, LA и P. Возвращает RGB-изображение.
+    """
+    def __init__(self, background_color=(255, 255, 255)):
+        if isinstance(background_color, str):
+            background_color = ImageColor.getrgb(background_color)
+        self.background_color = background_color[:3]
+
+    def process(self, img):
+        new_img = Image.new('RGB', img.size, self.background_color)
+        if img.mode in ('P', 'LA'):
+            img = img.convert('RGBA')
+        if img.mode in ('1', 'L', 'RGBA'):
+            new_img.paste(img, img)
+        else:
+            new_img.paste(img)
+        return new_img
