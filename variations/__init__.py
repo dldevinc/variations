@@ -12,14 +12,14 @@
     Пример
     ------
     from PIL import Image
-    from pilkit import processors
-    from libs.variations import Variation, prepare_image
-    from libs.variations.precessors import ColorOverlay
+    from variations import processors
+    from variations.variation import Variation
+    from variations.utils import prepare_image
 
     variation = Variation(
         size=(400, 0),
         max_height=800,
-        clip=True,
+        clip=False,
         upscale=False,
         anchor=processors.Anchor.TOP_LEFT,
         jpeg=dict(
@@ -30,7 +30,7 @@
             quality=90,
         ),
         postprocessors=[
-            ColorOverlay('#FF0000', overlay_opacity=0.25),
+            processors.ColorOverlay('#FF0000', overlay_opacity=0.25),
         ],
     )
     img = Image.open('source.jpg')
@@ -105,6 +105,3 @@
 # загрузка всех плагинов PIL
 from PIL import Image
 Image.init()
-
-from .variation import Variation
-from .utils import prepare_image

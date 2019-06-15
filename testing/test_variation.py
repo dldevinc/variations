@@ -1,7 +1,7 @@
 import unittest
 from pilkit import processors
+from variations import processors
 from variations.variation import Variation
-from variations.processors import ColorOverlay
 
 
 class TestVariationInit(unittest.TestCase):
@@ -99,7 +99,7 @@ class TestVariationInit(unittest.TestCase):
                 )
             ],
             postprocessors=[
-                ColorOverlay('#0000FF', 0.10)
+                processors.ColorOverlay('#0000FF', 0.10)
             ],
             extra=dict(
                 key='SomeWhat',

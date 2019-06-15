@@ -1,7 +1,8 @@
 import posixpath
 from collections import namedtuple
-from pilkit import processors, utils
+from pilkit import utils
 from pilkit.lib import Image
+from . import processors
 
 EXTENSION_MAP = {
     value: key
