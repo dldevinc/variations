@@ -1,5 +1,5 @@
 import logging
-from pilkit.lib import Image, ImageColor, ImageDraw
+from pilkit.lib import Image, ImageColor, ImageFilter
 from pilkit.processors import ResizeToFill
 
 
@@ -116,3 +116,12 @@ class MakeOpaque(object):
         else:
             new_img.paste(img)
         return new_img
+
+
+class GaussianBlur:
+    def __init__(self, raduis=2):
+        self.radius = raduis
+
+    def process(self, img):
+        radius = self.radius(*img.size) if callable(self.radius) else self.radius
+        return img.filter(ImageFilter.GaussianBlur(radius))

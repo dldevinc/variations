@@ -2,8 +2,8 @@ import os
 import unittest
 from PIL import Image, ImageChops
 from variations.variation import Variation
-from variations.processors import ColorOverlay
-from variations.utils import prepare_image
+from variations.processors import ColorOverlay, MakeOpaque, GaussianBlur
+from variations.utils import prepare_image, replace_extension
 
 TEST_IMAGES = os.path.abspath(os.path.dirname(__file__))
 OUTPUT_PATH = os.path.join(TEST_IMAGES, 'output')
@@ -173,3 +173,44 @@ class TestExifOrientation(unittest.TestCase):
                             diff = ImageChops.difference(result_img, target_img)
                             self.assertIsNone(diff.getbbox())
 
+
+class TestFilters(unittest.TestCase):
+    def test_gaussian_blur(self):
+        path = os.path.join(TEST_IMAGES, 'filters')
+        for filename in sorted(os.listdir(path)):
+            variation = Variation(
+                size=(120, 80),
+                face_detection=True,
+                format='webp',
+                webp=dict(
+                    quality=0,
+                ),
+                preprocessors=[
+                    MakeOpaque(),
+                ],
+                postprocessors=[
+                    GaussianBlur(lambda w, h: w // 32),
+                ]
+            )
+            with open(os.path.join(path, filename), 'rb') as fp:
+                img = Image.open(fp)
+                img = prepare_image(img)
+                new_img = variation.process(img)
+
+                output_path = os.path.join(OUTPUT_PATH, 'filters')
+                if not os.path.isdir(output_path):
+                    os.makedirs(output_path)
+
+                output_filename = variation.replace_extension(os.path.join(output_path, filename))
+                variation.save(new_img, output_filename)
+
+            # check output
+            with self.subTest(filename):
+                result_path = replace_extension(os.path.join(OUTPUT_PATH, 'filters', filename), 'webp')
+                target_path = replace_extension(os.path.join(TARGET_PATH, 'filters', filename), 'webp')
+                with open(result_path, 'rb') as result_fp:
+                    with open(target_path, 'rb') as target_fp:
+                        result_img = Image.open(result_fp)
+                        target_img = Image.open(target_fp)
+                        diff = ImageChops.difference(result_img, target_img)
+                        self.assertIsNone(diff.getbbox())
