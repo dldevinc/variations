@@ -235,37 +235,43 @@ class TestFilters(unittest.TestCase):
             processors.GaussianBlur(10),
         ])
 
-    # def test_custom(self):
-    #     path = os.path.join(helper.INPUT_PATH, 'filters')
-    #     for filename in sorted(os.listdir(path)):
-    #         variation = Variation(
-    #             size=(120, 80),
-    #             face_detection=True,
-    #             format='webp',
-    #             webp=dict(
-    #                 quality=0,
-    #             ),
-    #             preprocessors=[
-    #                 MakeOpaque(),
-    #             ],
-    #             postprocessors=[
-    #                 GaussianBlur(lambda w, h: w // 32),
-    #             ]
-    #         )
-    #         with open(os.path.join(path, filename), 'rb') as fp:
-    #             img = Image.open(fp)
-    #             img = prepare_image(img)
-    #             new_img = variation.process(img)
-    #
-    #             output_path = os.path.join(OUTPUT_PATH, 'filters')
-    #             if not os.path.isdir(output_path):
-    #                 os.makedirs(output_path)
-    #
-    #             output_filename = variation.replace_extension(os.path.join(output_path, filename))
-    #             variation.save(new_img, output_filename)
-    #
-    #         # check output
-    #         with self.subTest(filename):
-    #             result_path = replace_extension(os.path.join(OUTPUT_PATH, 'filters', filename), 'webp')
-    #             target_path = replace_extension(os.path.join(TARGET_PATH, 'filters', filename), 'webp')
-    #             self.assertIsNone(helper.image_diff(result_path, target_path))
+    def test_stack_blur(self):
+        if processors.STACK_BLUR_SUPPORT:
+            self._test_filter('stack_blur', [
+                processors.StackBlur(10),
+            ])
+
+    def test_custom(self):
+        path = os.path.join(helper.INPUT_PATH, 'filters')
+        for filename in sorted(os.listdir(path)):
+            variation = Variation(
+                size=(120, 80),
+                face_detection=True,
+                format='webp',
+                webp=dict(
+                    quality=0,
+                ),
+                preprocessors=[
+                    processors.MakeOpaque(),
+                ],
+                postprocessors=[
+                    processors.StackBlur(8),
+                ]
+            )
+            with open(os.path.join(path, filename), 'rb') as fp:
+                img = Image.open(fp)
+                img = prepare_image(img)
+                new_img = variation.process(img)
+
+                output_path = os.path.join(helper.OUTPUT_PATH, 'filters/custom')
+                if not os.path.isdir(output_path):
+                    os.makedirs(output_path)
+
+                output_filename = variation.replace_extension(os.path.join(output_path, filename))
+                variation.save(new_img, output_filename)
+
+            # check output
+            with self.subTest(filename):
+                result_path = replace_extension(os.path.join(helper.OUTPUT_PATH, 'filters/custom', filename), 'webp')
+                target_path = replace_extension(os.path.join(helper.TARGET_PATH, 'filters/custom', filename), 'webp')
+                self.assertIsNone(helper.image_diff(result_path, target_path))

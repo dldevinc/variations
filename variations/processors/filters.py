@@ -1,12 +1,20 @@
+from pilkit.lib import ImageFilter
+
 try:
     from PIL import ImageOps
 except ImportError:
     import ImageOps
 
-from pilkit.lib import ImageFilter
+try:
+    from stackblur import StackBlur as StackBlurFilter
+    STACK_BLUR_SUPPORT = True
+except ImportError:
+    StackBlurFilter = None
+    STACK_BLUR_SUPPORT = False
 
 __all__ = ['Grayscale', 'Posterize', 'Solarize', 'Blur', 'Sharpen', 'Smooth',
-           'EdgeEnhance', 'UnsharpMask', 'BoxBlur', 'GaussianBlur']
+           'EdgeEnhance', 'UnsharpMask', 'BoxBlur', 'GaussianBlur',
+           'STACK_BLUR_SUPPORT', 'StackBlur']
 
 
 class Grayscale:
@@ -83,3 +91,13 @@ class GaussianBlur:
     def process(self, img):
         radius = self.radius(*img.size) if callable(self.radius) else self.radius
         return img.filter(ImageFilter.GaussianBlur(radius))
+
+
+if STACK_BLUR_SUPPORT:
+    class StackBlur:
+        def __init__(self, radius=2):
+            self.radius = radius
+
+        def process(self, img):
+            radius = self.radius(*img.size) if callable(self.radius) else self.radius
+            return img.filter(StackBlurFilter(radius))
