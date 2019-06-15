@@ -32,7 +32,11 @@ class TestFaceDetection(unittest.TestCase):
 
             # check output
             with self.subTest(filename):
-                result_img = Image.open(os.path.join(OUTPUT_PATH, 'faces', filename))
-                target_img = Image.open(os.path.join(TARGET_PATH, 'faces', filename))
-                diff = ImageChops.difference(result_img, target_img)
-                self.assertIsNone(diff.getbbox())
+                result_path = os.path.join(OUTPUT_PATH, 'faces', filename)
+                target_path = os.path.join(TARGET_PATH, 'faces', filename)
+                with open(result_path, 'rb') as result_fp:
+                    with open(target_path, 'rb') as target_fp:
+                        result_img = Image.open(result_fp)
+                        target_img = Image.open(target_fp)
+                        diff = ImageChops.difference(result_img, target_img)
+                        self.assertIsNone(diff.getbbox())

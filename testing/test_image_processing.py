@@ -86,10 +86,14 @@ class TestVariationProcess(unittest.TestCase):
                 variation.save(new_img, output_path)
 
                 # check output
-                result_img = Image.open(os.path.join(OUTPUT_PATH, dirname, folder, output_filename))
-                target_img = Image.open(os.path.join(TARGET_PATH, dirname, folder, output_filename))
-                diff = ImageChops.difference(result_img, target_img)
-                self.assertIsNone(diff.getbbox())
+                result_path = os.path.join(OUTPUT_PATH, dirname, folder, output_filename)
+                target_path = os.path.join(TARGET_PATH, dirname, folder, output_filename)
+                with open(result_path, 'rb') as result_fp:
+                    with open(target_path, 'rb') as target_fp:
+                        result_img = Image.open(result_fp)
+                        target_img = Image.open(target_fp)
+                        diff = ImageChops.difference(result_img, target_img)
+                        self.assertIsNone(diff.getbbox())
 
         for size, canvas in self.SIZE_MAP[clip][upscale].items():
             filename_params = [
@@ -114,12 +118,13 @@ class TestVariationProcess(unittest.TestCase):
     def _test_format(self, dirname):
         path = os.path.join(TEST_IMAGES, dirname)
         for filename in os.listdir(path):
-            img = Image.open(os.path.join(path, filename))
-            img = prepare_image(img)
-            self._process_variation(img, dirname, filename, self.CLIP, self.NOUPSCALE)
-            self._process_variation(img, dirname, filename, self.CLIP, self.UPSCALE)
-            self._process_variation(img, dirname, filename, self.NOCLIP, self.NOUPSCALE)
-            self._process_variation(img, dirname, filename, self.NOCLIP, self.UPSCALE)
+            with open(os.path.join(path, filename), 'rb') as fp:
+                img = Image.open(fp)
+                img = prepare_image(img)
+                self._process_variation(img, dirname, filename, self.CLIP, self.NOUPSCALE)
+                self._process_variation(img, dirname, filename, self.CLIP, self.UPSCALE)
+                self._process_variation(img, dirname, filename, self.NOCLIP, self.NOUPSCALE)
+                self._process_variation(img, dirname, filename, self.NOCLIP, self.UPSCALE)
 
     def test_jpeg(self):
         self._test_format('jpg')
@@ -143,22 +148,28 @@ class TestExifOrientation(unittest.TestCase):
                 clip=False,
                 upscale=True,
             )
-            img = Image.open(os.path.join(path, filename))
-            img = prepare_image(img)
-            new_img = variation.process(img)
+            with open(os.path.join(path, filename), 'rb') as fp:
+                img = Image.open(fp)
+                img = prepare_image(img)
+                new_img = variation.process(img)
 
-            output_path = os.path.join(OUTPUT_PATH, 'exif')
-            if not os.path.isdir(output_path):
-                os.makedirs(output_path)
+                output_path = os.path.join(OUTPUT_PATH, 'exif')
+                if not os.path.isdir(output_path):
+                    os.makedirs(output_path)
 
-            variation.save(
-                new_img,
-                os.path.join(output_path, filename)
-            )
+                variation.save(
+                    new_img,
+                    os.path.join(output_path, filename)
+                )
 
-            # check output
-            with self.subTest(filename):
-                result_img = Image.open(os.path.join(OUTPUT_PATH, 'exif', filename))
-                target_img = Image.open(os.path.join(TARGET_PATH, 'exif', filename))
-                diff = ImageChops.difference(result_img, target_img)
-                self.assertIsNone(diff.getbbox())
+                # check output
+                with self.subTest(filename):
+                    result_path = os.path.join(OUTPUT_PATH, 'exif', filename)
+                    target_path = os.path.join(TARGET_PATH, 'exif', filename)
+                    with open(result_path, 'rb') as result_fp:
+                        with open(target_path, 'rb') as target_fp:
+                            result_img = Image.open(result_fp)
+                            target_img = Image.open(target_fp)
+                            diff = ImageChops.difference(result_img, target_img)
+                            self.assertIsNone(diff.getbbox())
+
