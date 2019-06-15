@@ -36,7 +36,8 @@
     img = Image.open('source.jpg')
     img = prepare_image(img, draft_size=variation.get_output_size(img.size))
     new_img = variation.process(img)
-    variation.save(new_img, 'final.png')
+    dest_path = variation.replace_extension('dest.jpg')
+    variation.save(new_img, dest_path)
 
     Параметры
     ---------
