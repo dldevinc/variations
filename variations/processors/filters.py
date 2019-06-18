@@ -9,8 +9,9 @@ try:
     from stackblur import StackBlur as StackBlurFilter
     STACK_BLUR_SUPPORT = True
 except ImportError:
-    StackBlurFilter = None
     STACK_BLUR_SUPPORT = False
+    StackBlurFilter = None
+    StackBlur = None
 
 __all__ = ['Grayscale', 'Posterize', 'Solarize', 'Blur', 'Sharpen', 'Smooth',
            'EdgeEnhance', 'UnsharpMask', 'BoxBlur', 'GaussianBlur',
