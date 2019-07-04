@@ -9,6 +9,7 @@ eggs/
 *.egg
 *.pyc
 
+.env/
 env/
 venv/
 testing/output

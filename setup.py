@@ -30,9 +30,12 @@ REQUIRED = [
 EXTRAS = {
     'optional': [
         'face_recognition',
-        'pillow-stackblur',
     ],
 }
+
+KEYWORDS = [
+
+]
 
 # The rest you shouldn't have to touch too much :)
 # ------------------------------------------------
@@ -106,7 +109,9 @@ setup(
     author_email=EMAIL,
     python_requires=REQUIRES_PYTHON,
     url=URL,
-    packages=find_packages(exclude=["testing", "testing.*"]),
+    license='BSD',
+    packages=['variations'],
+    package_data={},
     # If your package is a single module, use this instead of 'packages':
     # py_modules=['mypackage'],
 
@@ -115,8 +120,11 @@ setup(
     # },
     install_requires=REQUIRED,
     extras_require=EXTRAS,
+    tests_require=[
+        'tox',
+    ],
+    keywords=KEYWORDS,
     include_package_data=True,
-    license='BSD',
     classifiers=[
         'Development Status :: 4 - Beta',
         'Intended Audience :: Developers',
