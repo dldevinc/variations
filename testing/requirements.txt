@@ -1,4 +1,4 @@
-Pillow==5.2.0
-pilkit==1.1.6
+Pillow==6.1.0
+pilkit==2.0
 face_recognition==1.0.0
 pillow-stackblur==0.0.2
