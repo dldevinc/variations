@@ -245,9 +245,9 @@ class Variation:
         :type source_size: tuple|list
         :rtype: tuple
         """
-        size = Scaler(*source_size, upscale=self._upscale)
+        size = Scaler(*source_size, upscale=self.upscale)
         if self.clip:
-            if self._upscale:
+            if self.upscale:
                 if self.width and self.width > size.width:
                     size.set_width(self.width)
                 if self.height and self.height > size.height:
@@ -258,7 +258,7 @@ class Variation:
         else:
             max_width = min(self.max_width or self.width, self.width or self.max_width)
             max_height = min(self.max_height or self.height, self.height or self.max_height)
-            if self._upscale:
+            if self.upscale:
                 if max_width:
                     if max_height:
                         max_aspect_ratio = max_width / max_height
