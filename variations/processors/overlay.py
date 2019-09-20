@@ -9,7 +9,7 @@ except ImportError:
 __all__ = ['ColorOverlay']
 
 
-class ColorOverlay(object):
+class ColorOverlay:
     """
     Аналогичен pilkit-процессору ColorOverlay, но корректно работает с RGBA.
     """

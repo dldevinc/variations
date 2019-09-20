@@ -1,5 +1,6 @@
 import copy
 import logging
+from typing import Iterable, Sequence
 from pilkit.lib import Image
 from pilkit.utils import save_image
 from .scaler import Scaler
@@ -11,21 +12,9 @@ from . import processors
 class Variation:
     logger = logging.getLogger('variations')
 
-    def __init__(self, size, max_width=0, max_height=0, clip=True, upscale=False,
-            anchor=processors.Anchor.CENTER, face_detection=False, format=conf.AUTO_FORMAT,
-            preprocessors=None, postprocessors=None, **kwargs):
-        """
-        :type size: tuple|list
-        :type max_width: int | float
-        :type max_height: int | float
-        :type clip: bool
-        :type upscale: bool
-        :type anchor: str | tuple | list
-        :type face_detection: bool
-        :type format: str
-        :type preprocessors: list
-        :type postprocessors: list
-        """
+    def __init__(self, size: Sequence, max_width: int = 0, max_height: int = 0, clip: bool = True,
+            upscale: bool = False, anchor: str = processors.Anchor.CENTER, face_detection: bool = False,
+            format: str = conf.AUTO_FORMAT, preprocessors: Iterable = None, postprocessors: Iterable = None, **kwargs):
         self.size = size
         self.clip = clip
         self.upscale = upscale
@@ -200,12 +189,10 @@ class Variation:
     def preprocessors(self, value):
         if value is None:
             value = []
-        if not isinstance(value, (list, tuple)):
-            raise TypeError('"preprocessors" argument must be a sequence or None')
         for proc in value:
             if not hasattr(proc, 'process'):
                 raise TypeError('one of preprocessors has no method "process"')
-        self._preprocessors = value
+        self._preprocessors = list(value)
 
     @property
     def postprocessors(self):
@@ -215,12 +202,10 @@ class Variation:
     def postprocessors(self, value):
         if value is None:
             value = []
-        if not isinstance(value, (list, tuple)):
-            raise TypeError('"postprocessors" argument must be a sequence or None')
         for proc in value:
             if not hasattr(proc, 'process'):
                 raise TypeError('one of postprocessors has no method "process"')
-        self._postprocessors = value
+        self._postprocessors = list(value)
 
     @property
     def extra_context(self):
@@ -238,16 +223,13 @@ class Variation:
     def copy(self):
         return copy.deepcopy(self)
 
-    def get_output_size(self, source_size):
+    def get_output_size(self, source_size: Sequence) -> Sequence:
         """
         Вычисление финальных размеров холста по размерам исходного изображения.
-
-        :type source_size: tuple|list
-        :rtype: tuple
         """
-        size = Scaler(*source_size, upscale=self._upscale)
+        size = Scaler(*source_size, upscale=self.upscale)
         if self.clip:
-            if self._upscale:
+            if self.upscale:
                 if self.width and self.width > size.width:
                     size.set_width(self.width)
                 if self.height and self.height > size.height:
@@ -258,7 +240,7 @@ class Variation:
         else:
             max_width = min(self.max_width or self.width, self.width or self.max_width)
             max_height = min(self.max_height or self.height, self.height or self.max_height)
-            if self._upscale:
+            if self.upscale:
                 if max_width:
                     if max_height:
                         max_aspect_ratio = max_width / max_height
@@ -277,12 +259,9 @@ class Variation:
                     size.set_height(max_height)
             return self.width or size.width, self.height or size.height
 
-    def get_processor(self, size):
+    def get_processor(self, size: Sequence) -> processors.ProcessorPipeline:
         """
         Получение основного процессора вариации для указанного размера.
-
-        :type size: tuple | list
-        :rtype: pilkit.processors.ProcessorPipeline
         """
         canvas_size = self.get_output_size(size)
         if self.clip:
@@ -305,42 +284,31 @@ class Variation:
         procs = self.preprocessors + [proc] + self.postprocessors
         return processors.ProcessorPipeline(procs)
 
-    def process(self, img):
+    def process(self, img: Image) -> Image:
         """
         Обработка изображения.
-
-        :type img: PIL.Image.Image
-        :rtype: PIL.Image.Image
         """
         return self.get_processor(img.size).process(img)
 
-    def output_format(self, path):
+    def output_format(self, path: str) -> str:
         """
         Определение иготового формата изображения.
-
-        :type path: str
-        :rtype: str
         """
         format = self.format or conf.AUTO_FORMAT
         if format == conf.AUTO_FORMAT:
             format = utils.guess_format(path) or conf.DEFAULT_FORMAT
         return format
 
-    def replace_extension(self, path):
+    def replace_extension(self, path: str) -> str:
         """
         Замена расширения файла в пути path в соответсвии с вариацией.
-
-        :type path: str
-        :rtype: str
         """
         format = self.output_format(path)
         return utils.replace_extension(path, format)
 
-    def save(self, img, outfile, **options):
+    def save(self, img: Image, outfile: str, **options):
         """
         Сохранение картинки в файл.
-
-        :rtype: str
         """
         opts = options.copy()
         format = opts.pop('format', None) or self.output_format(outfile)
