@@ -242,6 +242,9 @@ class TestFilters(unittest.TestCase):
             ])
 
     def test_custom(self):
+        if not processors.STACK_BLUR_SUPPORT:
+            return
+
         path = os.path.join(helper.INPUT_PATH, 'filters')
         for filename in sorted(os.listdir(path)):
             variation = Variation(
