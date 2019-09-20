@@ -3,7 +3,7 @@ from pilkit.processors.base import *
 __all__ = ['ProcessorPipeline', 'Adjust', 'Reflection', 'Transpose', 'Anchor', 'MakeOpaque']
 
 
-class MakeOpaque(object):
+class MakeOpaque:
     """
     Подобен pilkit-процессору MakeOpaque, но работает с изображениями в любых
     режимах, включая RGB, LA и P. Возвращает RGB-изображение, а не RGBA.

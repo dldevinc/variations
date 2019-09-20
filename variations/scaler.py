@@ -12,12 +12,7 @@ class Scaler:
         '_upscale', '_ratio'
     )
 
-    def __init__(self, width, height, upscale=False):
-        """
-        :type width: int
-        :type height: int
-        :type upscale: bool
-        """
+    def __init__(self, width: int, height: int, upscale: bool = False):
         self._width = self._width_orig = int(width)
         self._height = self._height_orig = int(height)
         self._ratio = Fraction(width, height)

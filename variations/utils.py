@@ -1,4 +1,5 @@
 import posixpath
+from typing import IO, Union, Optional, Dict, Any, Sequence
 from collections import namedtuple
 from pilkit import utils
 from pilkit.lib import Image
@@ -14,12 +15,9 @@ EXTENSION_MAP['JPEG2000'] = '.j2k'
 EXTENSION_MAP['TIFF'] = '.tiff'
 
 
-def guess_format(fp):
+def guess_format(fp: Union[str, IO]) -> Optional[str]:
     """
     Определение формата, в котором будет сохранено изображение.
-
-    :type fp: str|typing.IO
-    :rtype: str
     """
     if isinstance(fp, (bytes, str)):
         filename = fp
@@ -35,13 +33,9 @@ def guess_format(fp):
         pass
 
 
-def replace_extension(path, format):
+def replace_extension(path: str, format: str) -> str:
     """
     Замена расширения файла в пути path на наиболее подходящее для формата format.
-
-    :type path: str
-    :type format: str
-    :rtype: str
     """
     try:
         best_ext = EXTENSION_MAP[format.upper()]
@@ -52,13 +46,9 @@ def replace_extension(path, format):
     return ''.join((root, best_ext))
 
 
-def apply_exif(img, info=None):
+def apply_exif(img: Image, info: Dict[str, Any] = None) -> Image:
     """
     Применение ориентации, указанной в EXIF-данных.
-
-    :type img: PIL.Image.Image
-    :type info: dict
-    :rtype: PIL.Image.Image
     """
     from PIL.JpegImagePlugin import _getexif
 
@@ -81,14 +71,9 @@ def apply_exif(img, info=None):
     return img
 
 
-def reset_transparency(img, color='#FFFFFF', format=None):
+def reset_transparency(img: Image, color: Union[str, Sequence] = '#FFFFFF', format: str = None) -> Image:
     """
     Замена RGB-составляющей полностью прозрачных пикселей на указанный цвет.
-
-    :type img: PIL.Image.Image
-    :type format: str
-    :type color: tuple | list | str
-    :rtype: PIL.Image.Image
     """
     format = format or img.format
     if format is None:
@@ -111,18 +96,13 @@ def reset_transparency(img, color='#FFFFFF', format=None):
     return Image.composite(img, overlay, mask)
 
 
-def prepare_image(img, draft_size=None, background_color=None):
+def prepare_image(img: Image, draft_size: Sequence = None, background_color: Union[str, Sequence] = None) -> Image:
     """
     1) Эффекивно уменьшает изображение методом Image.draft() для экономии памяти
        при обработке больших картинок.
     2) Примененяет ориентацию картинки, указанную в EXIF-данных
     3) Заливка RGB-данных в прозрачных пикселях указанным цветом во избежание
        артефактов при ресайзе
-
-    :type img: PIL.Image.Image
-    :type draft_size: list | tuple
-    :type background_color: list | tuple | str
-    :rtype: PIL.Image.Image
     """
     format = img.format
     if draft_size is not None and format == 'JPEG':
