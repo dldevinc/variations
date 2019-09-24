@@ -95,7 +95,7 @@ def reset_transparency(img: Image, color: Union[str, Sequence] = '#FFFFFF', form
     return Image.composite(img, overlay, mask)
 
 
-def prepare_image(img: Image, draft_size: Sequence = None, background_color: Union[str, Sequence] = None) -> Image:
+def prepare_image(img: Image, draft_size: Sequence[int] = None, background_color: Union[str, Sequence] = None) -> Image:
     """
     1) Эффекивно уменьшает изображение методом Image.draft() для экономии памяти
        при обработке больших картинок.
