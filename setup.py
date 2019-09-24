@@ -18,7 +18,7 @@ URL = 'https://github.com/dldevinc/variations'
 EMAIL = 'x896321475@gmail.com'
 AUTHOR = 'Mihail Mishakin'
 REQUIRES_PYTHON = '>=3.5.0'
-VERSION = '0.0.9'
+VERSION = '0.0.10'
 
 # What packages are required for this module to be executed?
 REQUIRED = [

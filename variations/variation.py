@@ -1,6 +1,6 @@
 import copy
 import logging
-from typing import Iterable, Sequence
+from typing import Iterable, Sequence, Tuple
 from pilkit.lib import Image
 from pilkit.utils import save_image
 from .scaler import Scaler
@@ -12,7 +12,7 @@ from . import processors
 class Variation:
     logger = logging.getLogger('variations')
 
-    def __init__(self, size: Sequence, max_width: int = 0, max_height: int = 0, clip: bool = True,
+    def __init__(self, size: Sequence[int], max_width: int = 0, max_height: int = 0, clip: bool = True,
             upscale: bool = False, anchor: str = processors.Anchor.CENTER, face_detection: bool = False,
             format: str = conf.AUTO_FORMAT, preprocessors: Iterable = None, postprocessors: Iterable = None, **kwargs):
         self.size = size
@@ -223,7 +223,7 @@ class Variation:
     def copy(self):
         return copy.deepcopy(self)
 
-    def get_output_size(self, source_size: Sequence) -> Sequence:
+    def get_output_size(self, source_size: Sequence[int]) -> Tuple[int, int]:
         """
         Вычисление финальных размеров холста по размерам исходного изображения.
         """
@@ -259,7 +259,7 @@ class Variation:
                     size.set_height(max_height)
             return self.width or size.width, self.height or size.height
 
-    def get_processor(self, size: Sequence) -> processors.ProcessorPipeline:
+    def get_processor(self, size: Sequence[int]) -> processors.ProcessorPipeline:
         """
         Получение основного процессора вариации для указанного размера.
         """
