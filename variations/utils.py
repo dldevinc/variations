@@ -3,16 +3,8 @@ from typing import IO, Union, Optional, Dict, Any, Sequence
 from collections import namedtuple
 from pilkit import utils
 from pilkit.lib import Image
+from . import conf
 from . import processors
-
-EXTENSION_MAP = {
-    value: key
-    for key, value in Image.EXTENSION.items()
-}
-EXTENSION_MAP['PNG'] = '.png'
-EXTENSION_MAP['JPEG'] = '.jpg'
-EXTENSION_MAP['JPEG2000'] = '.j2k'
-EXTENSION_MAP['TIFF'] = '.tiff'
 
 
 def guess_format(fp: Union[str, IO]) -> Optional[str]:
@@ -33,17 +25,24 @@ def guess_format(fp: Union[str, IO]) -> Optional[str]:
         pass
 
 
+def get_preferred_extension(format: str) -> str:
+    """
+    Возвращает наиболее подходящее расширение для формата format.
+    """
+    return conf.PREFERRED_EXTENSIONS[format.upper()]
+
+
 def replace_extension(path: str, format: str) -> str:
     """
     Замена расширения файла в пути path на наиболее подходящее для формата format.
     """
     try:
-        best_ext = EXTENSION_MAP[format.upper()]
+        preferred_extension = get_preferred_extension(format)
     except KeyError:
         return path
 
-    root, old_ext = posixpath.splitext(path)
-    return ''.join((root, best_ext))
+    root, original_ext = posixpath.splitext(path)
+    return ''.join((root, preferred_extension))
 
 
 def apply_exif(img: Image, info: Dict[str, Any] = None) -> Image:
