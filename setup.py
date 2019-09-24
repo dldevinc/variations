@@ -18,7 +18,7 @@ URL = 'https://github.com/dldevinc/variations'
 EMAIL = 'x896321475@gmail.com'
 AUTHOR = 'Mihail Mishakin'
 REQUIRES_PYTHON = '>=3.5.0'
-VERSION = '0.0.8'
+VERSION = '0.0.9'
 
 # What packages are required for this module to be executed?
 REQUIRED = [
@@ -110,7 +110,7 @@ setup(
     python_requires=REQUIRES_PYTHON,
     url=URL,
     license='BSD',
-    packages=find_packages(exclude=["testing", "*.tests", "*.tests.*", "tests.*", "tests"]),
+    packages=find_packages(exclude=["*.tests", "*.tests.*", "tests.*", "tests"]),
     package_data={},
     # If your package is a single module, use this instead of 'packages':
     # py_modules=['mypackage'],
