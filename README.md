@@ -66,3 +66,26 @@ A simple interface that allows to process images.
 | **format**         | str                  | `'JPEG'` `'png'` `'WebM'`                                 | Enforce output image format. Defaults to `'AUTO'`, which means keep input format.                                                                        |
 | **preprocessors**  | list                 | `[processors.Crop(width=200, height=120, x=50, y=50)]`      | [PilKit](https://github.com/matthewwithanm/pilkit) processors are invoked before the main processing stage                                               |
 | **postprocessors** | list                 | `[processors.ColorOverlay('#0000FF', 0.10)]`                | [PilKit](https://github.com/matthewwithanm/pilkit) processors are invoked after the main processing stage                                                |
+
+## Additional options
+
+It is possible to pass additional [options](https://pillow.readthedocs.io/en/latest/handbook/image-file-formats.html)
+to `save()` method.
+
+```python
+# Defaults
+Variation(
+    # ...
+    jpeg=dict(
+        quality=85,
+        progressive=True,
+    ),
+    webp=dict(
+        autoconvert=False,
+        quality=85,
+    ),
+    tiff=dict(
+        compression='jpeg',
+    )
+)
+```
