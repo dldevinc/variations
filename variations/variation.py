@@ -296,7 +296,7 @@ class Variation:
         """
         format = self.format or conf.AUTO_FORMAT
         if format == conf.AUTO_FORMAT:
-            format = utils.guess_format(path) or conf.DEFAULT_FORMAT
+            format = utils.guess_format(path) or conf.FALLBACK_FORMAT
         return format
 
     def replace_extension(self, path: str) -> str:
@@ -316,10 +316,16 @@ class Variation:
 
         # настройки для конкретного формата
         format_options = {}
-        format_options.update(conf.DEFAULT_EXTRA.get(format, {}))
         format_options.update(self.extra_context.get(format, {}))
         for k, v in format_options.items():
             opts.setdefault(k, v)
 
-        autoconvert = opts.pop('autoconvert', True)
+        # включаем autoconvert по умолчанию для всех форматов, кроме WebP
+        autoconvert = opts.pop('autoconvert', None)
+        if autoconvert is None:
+            if format == 'webp':
+                autoconvert = False
+            else:
+                autoconvert = True
+
         save_image(img, outfile, format=format, options=opts, autoconvert=autoconvert)

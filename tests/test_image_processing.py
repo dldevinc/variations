@@ -151,11 +151,12 @@ class TestExifOrientation(unittest.TestCase):
 
                 variation.save(new_img, os.path.join(output_path, filename))
 
-                # check output
-                with self.subTest(filename):
-                    result_path = os.path.join(helper.OUTPUT_PATH, 'exif', filename)
-                    target_path = os.path.join(helper.TARGET_PATH, 'exif', filename)
-                    self.assertIsNone(helper.image_diff(result_path, target_path))
+        # check output
+        for filename in os.listdir(path):
+            with self.subTest(filename):
+                result_path = os.path.join(helper.OUTPUT_PATH, 'exif', filename)
+                target_path = os.path.join(helper.TARGET_PATH, 'exif', filename)
+                self.assertIsNone(helper.image_diff(result_path, target_path))
 
 
 class TestFilters(unittest.TestCase):
@@ -177,7 +178,8 @@ class TestFilters(unittest.TestCase):
 
                 variation.save(new_img, os.path.join(output_path, filename))
 
-            # check output
+        # check output
+        for filename in sorted(os.listdir(path)):
             with self.subTest(filename):
                 result_path = os.path.join(helper.OUTPUT_PATH, 'filters', folder, filename)
                 target_path = os.path.join(helper.TARGET_PATH, 'filters', folder, filename)

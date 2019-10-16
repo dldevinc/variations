@@ -3,25 +3,8 @@ from pilkit.lib import Image
 # Значение параметра format для автоматического определения итогового формата
 AUTO_FORMAT = 'AUTO'
 
-# Выходной формат изображения, если удалось установить автоматически
-DEFAULT_FORMAT = 'JPEG'
-
-DEFAULT_EXTRA = dict(
-    jpeg=dict(
-        quality=85,
-        progressive=True,
-    ),
-    png=dict(
-
-    ),
-    webp=dict(
-        autoconvert=False,
-        quality=85,
-    ),
-    tiff=dict(
-        compression='jpeg',
-    )
-)
+# Выходной формат изображения, если не удалось установить автоматически
+FALLBACK_FORMAT = 'JPEG'
 
 # Предпочитаемые расширения
 PREFERRED_EXTENSIONS = {
