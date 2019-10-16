@@ -316,7 +316,6 @@ class Variation:
 
         # настройки для конкретного формата
         format_options = {}
-        format_options.update(conf.DEFAULT_EXTRA.get(format, {}))
         format_options.update(self.extra_context.get(format, {}))
         for k, v in format_options.items():
             opts.setdefault(k, v)
