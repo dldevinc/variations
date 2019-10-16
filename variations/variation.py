@@ -296,7 +296,7 @@ class Variation:
         """
         format = self.format or conf.AUTO_FORMAT
         if format == conf.AUTO_FORMAT:
-            format = utils.guess_format(path) or conf.DEFAULT_FORMAT
+            format = utils.guess_format(path) or conf.FALLBACK_FORMAT
         return format
 
     def replace_extension(self, path: str) -> str:
