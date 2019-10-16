@@ -320,5 +320,12 @@ class Variation:
         for k, v in format_options.items():
             opts.setdefault(k, v)
 
-        autoconvert = opts.pop('autoconvert', True)
+        # включаем autoconvert по умолчанию для всех форматов, кроме WebP
+        autoconvert = opts.pop('autoconvert', None)
+        if autoconvert is None:
+            if format == 'webp':
+                autoconvert = False
+            else:
+                autoconvert = True
+
         save_image(img, outfile, format=format, options=opts, autoconvert=autoconvert)
