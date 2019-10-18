@@ -9,8 +9,7 @@ from . import processors
 
 def guess_format(fp: Union[str, IO]) -> Optional[str]:
     """
-    Определение формата изображение по расширению файла
-    .
+    Определение формата изображение по расширению файла.
     """
     if isinstance(fp, (bytes, str)):
         filename = fp

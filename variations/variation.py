@@ -292,7 +292,7 @@ class Variation:
 
     def output_format(self, path: str) -> str:
         """
-        Определение иготового формата изображения.
+        Определение итогового формата изображения.
         """
         format = self.format or conf.AUTO_FORMAT
         if format == conf.AUTO_FORMAT:
@@ -301,7 +301,7 @@ class Variation:
 
     def replace_extension(self, path: str) -> str:
         """
-        Замена расширения файла в пути path в соответсвии с вариацией.
+        Замена расширения файла в пути path в соответствии с вариацией.
         """
         format = self.output_format(path)
         return utils.replace_extension(path, format)
