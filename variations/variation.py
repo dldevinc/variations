@@ -12,7 +12,7 @@ from . import processors
 class Variation:
     logger = logging.getLogger('variations')
 
-    def __init__(self, size: Sequence[int], max_width: int = 0, max_height: int = 0, clip: bool = True,
+    def __init__(self, size: Sequence[int] = (0, 0), max_width: int = 0, max_height: int = 0, clip: bool = True,
             upscale: bool = False, anchor: str = processors.Anchor.CENTER, face_detection: bool = False,
             format: str = conf.AUTO_FORMAT, preprocessors: Iterable = None, postprocessors: Iterable = None, **kwargs):
         self.size = size
@@ -292,7 +292,7 @@ class Variation:
 
     def output_format(self, path: str) -> str:
         """
-        Определение иготового формата изображения.
+        Определение итогового формата изображения.
         """
         format = self.format or conf.AUTO_FORMAT
         if format == conf.AUTO_FORMAT:
@@ -301,7 +301,7 @@ class Variation:
 
     def replace_extension(self, path: str) -> str:
         """
-        Замена расширения файла в пути path в соответсвии с вариацией.
+        Замена расширения файла в пути path в соответствии с вариацией.
         """
         format = self.output_format(path)
         return utils.replace_extension(path, format)
