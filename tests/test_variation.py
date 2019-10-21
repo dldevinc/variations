@@ -5,6 +5,10 @@ from variations.variation import Variation
 
 
 class TestVariationInit(unittest.TestCase):
+    def test_variation_default_size(self):
+        v = Variation()
+        self.assertEqual(v.size, (0, 0))
+
     def test_variation_size(self):
         type_error_sizes = [
             None,

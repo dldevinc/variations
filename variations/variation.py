@@ -12,7 +12,7 @@ from . import processors
 class Variation:
     logger = logging.getLogger('variations')
 
-    def __init__(self, size: Sequence[int], max_width: int = 0, max_height: int = 0, clip: bool = True,
+    def __init__(self, size: Sequence[int] = (0, 0), max_width: int = 0, max_height: int = 0, clip: bool = True,
             upscale: bool = False, anchor: str = processors.Anchor.CENTER, face_detection: bool = False,
             format: str = conf.AUTO_FORMAT, preprocessors: Iterable = None, postprocessors: Iterable = None, **kwargs):
         self.size = size
