@@ -1,6 +1,6 @@
 import copy
 import logging
-from typing import Iterable, Sequence, Tuple
+from typing import Iterable, Sequence, Tuple, Union, BinaryIO
 from pilkit.lib import Image
 from pilkit.utils import save_image
 from .scaler import Scaler
@@ -306,12 +306,19 @@ class Variation:
         format = self.output_format(path)
         return utils.replace_extension(path, format)
 
-    def save(self, img: Image, outfile: str, **options):
+    def save(self, img: Image, outfile: Union[BinaryIO, str], **options):
         """
         Сохранение картинки в файл.
         """
         opts = options.copy()
-        format = opts.pop('format', None) or self.output_format(outfile)
+        format = opts.pop('format', None)
+        if not format:
+            if isinstance(outfile, str):
+                format = self.output_format(outfile)
+            elif hasattr(outfile, 'name'):
+                format = self.output_format(outfile.name)
+            else:
+                format = conf.FALLBACK_FORMAT
         format = format.lower()
 
         # настройки для конкретного формата
