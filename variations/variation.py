@@ -317,6 +317,8 @@ class Variation:
                 format = self.output_format(outfile)
             elif hasattr(outfile, 'name'):
                 format = self.output_format(outfile.name)
+            elif self.format and self.format != conf.AUTO_FORMAT:
+                format = self.format
             else:
                 format = conf.FALLBACK_FORMAT
         format = format.lower()
