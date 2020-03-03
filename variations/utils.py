@@ -45,7 +45,7 @@ def replace_extension(path: str, format: str) -> str:
     return ''.join((root, preferred_extension))
 
 
-def apply_exif(img: Image, info: Dict[str, Any] = None) -> Image:
+def apply_exif_orientation(img: Image, info: Dict[str, Any] = None) -> Image:
     """
     Применение ориентации, указанной в EXIF-данных.
     """
@@ -107,7 +107,7 @@ def prepare_image(img: Image, draft_size: Sequence[int] = None, background_color
     if draft_size is not None and format == 'JPEG':
         img.draft(img.mode, draft_size)
     if format in {'JPEG', 'TIFF'}:
-        img = apply_exif(img)
+        img = apply_exif_orientation(img)
 
     # TODO: перепроверить необходимость
     if background_color is not None and img.mode in ('RGBA', 'P'):
