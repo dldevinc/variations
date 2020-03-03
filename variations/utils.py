@@ -97,7 +97,7 @@ def reset_transparency(img: Image, color: Union[str, Sequence] = '#FFFFFF', form
 
 def prepare_image(img: Image, draft_size: Sequence[int] = None, background_color: Union[str, Sequence] = None) -> Image:
     """
-    1) Эффекивно уменьшает изображение методом Image.draft() для экономии памяти
+    1) Эффективно уменьшает изображение методом Image.draft() для экономии памяти
        при обработке больших картинок.
     2) Примененяет ориентацию картинки, указанную в EXIF-данных
     3) Заливка RGB-данных в прозрачных пикселях указанным цветом во избежание
