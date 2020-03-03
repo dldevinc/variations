@@ -306,6 +306,16 @@ class Variation:
         format = self.output_format(path)
         return utils.replace_extension(path, format)
 
+    def _detect_format(self, outfile: Union[BinaryIO, str]):
+        if isinstance(outfile, str):
+            return self.output_format(outfile)
+        elif hasattr(outfile, 'name'):
+            return self.output_format(outfile.name)
+        elif self.format and self.format != conf.AUTO_FORMAT:
+            return self.format
+        else:
+            return conf.FALLBACK_FORMAT
+
     def save(self, img: Image, outfile: Union[BinaryIO, str], **options):
         """
         Сохранение картинки в файл.
@@ -313,14 +323,7 @@ class Variation:
         opts = options.copy()
         format = opts.pop('format', None)
         if not format:
-            if isinstance(outfile, str):
-                format = self.output_format(outfile)
-            elif hasattr(outfile, 'name'):
-                format = self.output_format(outfile.name)
-            elif self.format and self.format != conf.AUTO_FORMAT:
-                format = self.format
-            else:
-                format = conf.FALLBACK_FORMAT
+            format = self._detect_format(outfile)
         format = format.lower()
 
         # настройки для конкретного формата
