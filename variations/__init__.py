@@ -103,5 +103,11 @@
 """
 
 # загрузка всех плагинов PIL
-from PIL import Image
-Image.init()
+try:
+    from PIL import Image
+    Image.init()
+except ImportError:
+    # prevent error when calling `pip install -e .`
+    pass
+
+__version__ = "0.0.15"
