@@ -1,4 +1,4 @@
-from pilkit.lib import Image, ImageColor
+from pilkit.lib import ImageColor
 
 try:
     # pilkit >= 2.0 compat
@@ -13,6 +13,7 @@ class ColorOverlay:
     """
     Аналогичен pilkit-процессору ColorOverlay, но корректно работает с RGBA.
     """
+
     def __init__(self, color, overlay_opacity=0.5):
         self.color = color
         self.overlay_opacity = overlay_opacity

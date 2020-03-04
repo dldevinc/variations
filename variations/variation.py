@@ -1,20 +1,31 @@
 import copy
 import logging
-from typing import Iterable, Sequence, Tuple, Union, BinaryIO
+from typing import BinaryIO, Iterable, Sequence, Tuple, Union
+
 from pilkit.lib import Image
 from pilkit.utils import save_image
+
+from . import conf, processors, utils
 from .scaler import Scaler
-from . import conf
-from . import utils
-from . import processors
 
 
 class Variation:
     logger = logging.getLogger('variations')
 
-    def __init__(self, size: Sequence[int] = (0, 0), max_width: int = 0, max_height: int = 0, clip: bool = True,
-            upscale: bool = False, anchor: str = processors.Anchor.CENTER, face_detection: bool = False,
-            format: str = conf.AUTO_FORMAT, preprocessors: Iterable = None, postprocessors: Iterable = None, **kwargs):
+    def __init__(
+        self,
+        size: Sequence[int] = (0, 0),
+        max_width: int = 0,
+        max_height: int = 0,
+        clip: bool = True,
+        upscale: bool = False,
+        anchor: str = processors.Anchor.CENTER,
+        face_detection: bool = False,
+        format: str = conf.AUTO_FORMAT,
+        preprocessors: Iterable = None,
+        postprocessors: Iterable = None,
+        **kwargs
+    ):
         self.size = size
         self.clip = clip
         self.upscale = upscale
@@ -32,7 +43,9 @@ class Variation:
             try:
                 import face_recognition
             except ImportError:
-                self.logger.warning("Cannot use face detection because 'face_recognition' is not installed.")
+                self.logger.warning(
+                    "Cannot use face detection because 'face_recognition' is not installed."
+                )
 
     @property
     def clip(self):
@@ -152,7 +165,9 @@ class Variation:
         if isinstance(value, str):
             value = processors.Anchor.get_tuple(value.lower())
 
-        error_msg = '"anchor" argument must be a sequence of two float numbers between 0 and 1'
+        error_msg = (
+            '"anchor" argument must be a sequence of two float numbers between 0 and 1'
+        )
         if not isinstance(value, (tuple, list)):
             raise TypeError(error_msg)
 
@@ -215,10 +230,7 @@ class Variation:
     def extra_context(self, value):
         if not isinstance(value, dict):
             raise TypeError(value)
-        self._extra_context = {
-            k.lower(): v
-            for k, v in value.items()
-        }
+        self._extra_context = {k.lower(): v for k, v in value.items()}
 
     def copy(self):
         return copy.deepcopy(self)
@@ -239,7 +251,9 @@ class Variation:
             return width, height
         else:
             max_width = min(self.max_width or self.width, self.width or self.max_width)
-            max_height = min(self.max_height or self.height, self.height or self.max_height)
+            max_height = min(
+                self.max_height or self.height, self.height or self.max_height
+            )
             if self.upscale:
                 if max_width:
                     if max_height:
@@ -270,15 +284,15 @@ class Variation:
                 height=canvas_size[1],
                 anchor=self.anchor,
                 upscale=self._upscale,
-                face_detection=self.face_detection
+                face_detection=self.face_detection,
             )
         else:
             proc = processors.ResizeToFit(
                 width=canvas_size[0],
                 height=canvas_size[1],
                 anchor=self.anchor,
-                mat_color=(255, 255, 255, 0),   # not background
-                upscale=self._upscale
+                mat_color=(255, 255, 255, 0),  # not background
+                upscale=self._upscale,
             )
 
         procs = self.preprocessors + [proc] + self.postprocessors
@@ -333,11 +347,9 @@ class Variation:
             opts.setdefault(k, v)
 
         # включаем autoconvert по умолчанию для всех форматов, кроме WebP
-        autoconvert = opts.pop('autoconvert', None)
-        if autoconvert is None:
-            if format == 'webp':
-                autoconvert = False
-            else:
-                autoconvert = True
+        if format == 'webp':
+            autoconvert = opts.pop('autoconvert', False)
+        else:
+            autoconvert = opts.pop('autoconvert', True)
 
         save_image(img, outfile, format=format, options=opts, autoconvert=autoconvert)

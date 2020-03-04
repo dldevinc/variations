@@ -7,9 +7,12 @@ class Scaler:
     """
 
     __slots__ = (
-        '_width', '_height',
-        '_width_orig', '_height_orig',
-        '_upscale', '_ratio'
+        '_width',
+        '_height',
+        '_width_orig',
+        '_height_orig',
+        '_upscale',
+        '_ratio',
     )
 
     def __init__(self, width: int, height: int, upscale: bool = False):

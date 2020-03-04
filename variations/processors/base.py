@@ -1,6 +1,13 @@
 from pilkit.processors.base import *
 
-__all__ = ['ProcessorPipeline', 'Adjust', 'Reflection', 'Transpose', 'Anchor', 'MakeOpaque']
+__all__ = [
+    'ProcessorPipeline',
+    'Adjust',
+    'Reflection',
+    'Transpose',
+    'Anchor',
+    'MakeOpaque',
+]
 
 
 class MakeOpaque:
@@ -9,6 +16,7 @@ class MakeOpaque:
     режимах, включая RGB, LA и P. Возвращает RGB-изображение, а не RGBA.
     NOTE: полностью игнорирует alpha-канал фонового цвета.
     """
+
     def __init__(self, background_color=(255, 255, 255)):
         if isinstance(background_color, str):
             background_color = ImageColor.getrgb(background_color)

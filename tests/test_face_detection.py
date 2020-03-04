@@ -1,31 +1,24 @@
 import os
-import unittest
+
 from pilkit.lib import Image
-from variations.variation import Variation
 from variations.utils import prepare_image
+from variations.variation import Variation
+
 from . import helper
 
 
-class TestFaceDetection(unittest.TestCase):
-    def test_faces(self):
-        path = os.path.join(helper.INPUT_PATH, 'faces')
-        for filename in sorted(os.listdir(path)):
-            variation = Variation(
-                size=(480, 480),
-                face_detection=True
-            )
-            img = Image.open(os.path.join(path, filename))
-            img = prepare_image(img)
-            new_img = variation.process(img)
+def test_face_detection(face_image_filename):
+    input_path = os.path.join(helper.INPUT_PATH, 'faces', face_image_filename)
 
-            output_path = os.path.join(helper.OUTPUT_PATH, 'faces')
-            if not os.path.isdir(output_path):
-                os.makedirs(output_path)
+    img = Image.open(input_path)
+    img = prepare_image(img)
+    variation = Variation(size=(480, 480), face_detection=True)
+    new_img = variation.process(img)
 
-            variation.save(new_img, os.path.join(output_path, filename))
+    output_path = os.path.join(helper.OUTPUT_PATH, 'faces', face_image_filename)
+    helper.ensure_folder(output_path)
+    variation.save(new_img, output_path)
 
-            # check output
-            with self.subTest(filename):
-                result_path = os.path.join(helper.OUTPUT_PATH, 'faces', filename)
-                target_path = os.path.join(helper.TARGET_PATH, 'faces', filename)
-                self.assertIsNone(helper.image_diff(result_path, target_path))
+    # check output
+    target_path = os.path.join(helper.TARGET_PATH, 'faces', face_image_filename)
+    assert helper.image_diff(output_path, target_path) is None

@@ -1,10 +1,10 @@
 import posixpath
-from typing import IO, Union, Optional, Dict, Any, Sequence
 from collections import namedtuple
-from pilkit import utils
+from typing import IO, Any, Dict, Optional, Sequence, Union
+
 from pilkit.lib import Image
-from . import conf
-from . import processors
+
+from . import conf, processors
 
 
 def guess_format(fp: Union[str, IO]) -> Optional[str]:
@@ -70,32 +70,20 @@ def apply_exif_orientation(img: Image, info: Dict[str, Any] = None) -> Image:
     return img
 
 
-def reset_transparency(img: Image, color: Union[str, Sequence] = '#FFFFFF', format: str = None) -> Image:
+def make_opaque(img: Image, color: Union[str, Sequence] = '#FFFFFF') -> Image:
     """
     Замена RGB-составляющей полностью прозрачных пикселей на указанный цвет.
     """
-    format = format or img.format
-    if format is None:
-        return img
-    else:
-        format = format.upper()
-
-    if img.mode == 'RGBA':
-        if format not in utils.RGBA_TRANSPARENCY_FORMATS:
-            return img
-    elif img.mode == 'P':
-        if format not in utils.PALETTE_TRANSPARENCY_FORMATS:
-            return img
-    else:
-        return img
-
     img = img.convert('RGBA')
-    overlay = Image.new('RGB', img.size, color)
-    mask = img.getchannel('A')
-    return Image.composite(img, overlay, mask)
+    overlay = Image.new('RGBA', img.size, color)
+    return Image.alpha_composite(overlay, img)
 
 
-def prepare_image(img: Image, draft_size: Sequence[int] = None, background_color: Union[str, Sequence] = None) -> Image:
+def prepare_image(
+    img: Image,
+    draft_size: Sequence[int] = None,
+    background_color: Union[str, Sequence] = None,
+) -> Image:
     """
     1) Эффективно уменьшает изображение методом Image.draft() для экономии памяти
        при обработке больших картинок.
@@ -109,7 +97,6 @@ def prepare_image(img: Image, draft_size: Sequence[int] = None, background_color
     if format in {'JPEG', 'TIFF'}:
         img = apply_exif_orientation(img)
 
-    # TODO: перепроверить необходимость
-    if background_color is not None and img.mode in ('RGBA', 'P'):
-        img = reset_transparency(img, background_color, format=format)
+    if background_color is not None:
+        img = make_opaque(img, background_color)
     return img

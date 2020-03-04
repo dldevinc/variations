@@ -1,8 +1,18 @@
 import logging
+
 from pilkit.processors.resize import *
 
-__all__ = ['Resize', 'ResizeToCover', 'ResizeToFill', 'SmartResize',
-           'ResizeCanvas', 'AddBorder', 'ResizeToFit', 'Thumbnail', 'FaceDetectionResizeToFill']
+__all__ = [
+    'Resize',
+    'ResizeToCover',
+    'ResizeToFill',
+    'SmartResize',
+    'ResizeCanvas',
+    'AddBorder',
+    'ResizeToFit',
+    'Thumbnail',
+    'FaceDetectionResizeToFill',
+]
 
 
 class FaceDetectionResizeToFill(ResizeToFill):
@@ -10,6 +20,7 @@ class FaceDetectionResizeToFill(ResizeToFill):
     Добавление функции определения лиц.
     TODO: плохо, что приходится расширять процессор таким ради подмены anchor.
     """
+
     def __init__(self, *args, face_detection=False, **kwargs):
         self.face_detection = face_detection
         super().__init__(*args, **kwargs)
@@ -20,7 +31,9 @@ class FaceDetectionResizeToFill(ResizeToFill):
             import numpy
             import face_recognition
         except ImportError:
-            logging.warning("Cannot use face detection because 'face_recognition' is not installed.")
+            logging.warning(
+                "Cannot use face detection because 'face_recognition' is not installed."
+            )
             return
 
         if img.mode not in ('RGB', 'L'):
@@ -29,7 +42,9 @@ class FaceDetectionResizeToFill(ResizeToFill):
         else:
             image_data = numpy.array(img)
 
-        faces = face_recognition.face_locations(image_data, number_of_times_to_upsample=0)
+        faces = face_recognition.face_locations(
+            image_data, number_of_times_to_upsample=0
+        )
         if not faces:
             return
 
@@ -40,14 +55,17 @@ class FaceDetectionResizeToFill(ResizeToFill):
             rect[1] = max(rect[1], right)
             rect[2] = max(rect[2], bottom)
             rect[3] = min(rect[3], left)
-        return rect[3], rect[0], rect[1], rect[2]   # left, top, right, bottom
+        return rect[3], rect[0], rect[1], rect[2]  # left, top, right, bottom
 
     def _get_new_anchor(self, img, roi_rect):
         original_width, original_height = img.size
-        ratio = max(float(self.width) / original_width,
-                    float(self.height) / original_height)
-        new_width, new_height = (int(round(original_width * ratio)),
-                                 int(round(original_height * ratio)))
+        ratio = max(
+            float(self.width) / original_width, float(self.height) / original_height
+        )
+        new_width, new_height = (
+            int(round(original_width * ratio)),
+            int(round(original_height * ratio)),
+        )
 
         left, top, right, bottom = roi_rect
         x = (left + right) / 2 * ratio
@@ -57,7 +75,9 @@ class FaceDetectionResizeToFill(ResizeToFill):
             anchor_x = max(0, min((x - self.width / 2) / (new_width - self.width), 1))
         anchor_y = 0
         if new_height != self.height:
-            anchor_y = max(0, min((y - self.height / 2) / (new_height - self.height), 1))
+            anchor_y = max(
+                0, min((y - self.height / 2) / (new_height - self.height), 1)
+            )
         return anchor_x, anchor_y
 
     def process(self, img):
