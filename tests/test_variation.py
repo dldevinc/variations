@@ -1,92 +1,141 @@
-import unittest
+import io
+
+import pytest
 from pilkit import processors
 from variations import processors
 from variations.variation import Variation
 
 
-class TestVariationInit(unittest.TestCase):
-    def test_variation_default_size(self):
+class TestVariation:
+    def test_default_size(self):
         v = Variation()
-        self.assertEqual(v.size, (0, 0))
+        assert v.size == (0, 0)
 
-    def test_variation_size(self):
-        type_error_sizes = [
-            None,
-            '65',
-            {100, 200},
-            {100: 10, 200: 20},
-        ]
+    def test_fail_setters(self):
+        v = Variation()
+        with pytest.raises(TypeError):
+            v.clip = 'yes'
 
-        value_error_sizes = [
-            (),
-            [],
-            (100, ),
-            [10, -1.6],
-            (-100, -200),
-            ('-100', '200'),
-            [100, 200, 300],
-        ]
+        with pytest.raises(TypeError):
+            v.upscale = 'yes'
 
-        pass_values = [
-            (0, 0),
-            (100, 200),
-            ('100', '200'),
-            [100, 200],
-            ['100', '200'],
-            (100.6, 200.7),
-            (x for x in [100, 200]),
-            [x for x in [100, 200]],
-        ]
+        with pytest.raises(TypeError):
+            v.face_detection = 'yes'
 
-        for size in type_error_sizes:
-            with self.assertRaises(TypeError):
-                Variation(size)
+        with pytest.raises(TypeError):
+            v.format = ['JPG']
 
-        for size in value_error_sizes:
-            with self.assertRaises(ValueError):
-                Variation(size)
+        with pytest.raises(ValueError):
+            v.format = 'MP4'
 
-        for size in pass_values:
+        with pytest.raises(TypeError):
+            v.preprocessors = [{'process': None}]
+
+        with pytest.raises(TypeError):
+            v.postprocessors = [{'process': None}]
+
+        with pytest.raises(TypeError):
+            v.extra_context = ['data', 'extras']
+
+    def test_output_format(self):
+        variation = Variation()
+        assert variation.output_format('image.Webp') == 'WEBP'
+        assert variation.output_format('image.mp3') == 'JPEG'
+
+        variation = Variation(format='PNG')
+        assert variation.output_format('image.Webp') == 'PNG'
+        assert variation.output_format('image.mp3') == 'PNG'
+
+    def test_detect_format(self):
+        variation = Variation()
+        assert variation._detect_format('image.jpg') == 'JPEG'
+        assert variation._detect_format('image.jpeg') == 'JPEG'
+        assert variation._detect_format('image.mp3') == 'JPEG'
+
+        with io.BytesIO() as file:
+            assert variation._detect_format(file) == 'JPEG'  # FALLBACK_FORMAT
+
+            file.name = 'image.png'
+            assert variation._detect_format(file) == 'PNG'
+
+        gif_variation = Variation(format='GIF')
+        with io.BytesIO() as file:
+            assert gif_variation._detect_format(file) == 'GIF'
+
+            file.name = 'image.mp3'
+            assert gif_variation._detect_format(file) == 'GIF'
+
+    @pytest.mark.parametrize('size', [
+        None,
+        '65',
+        {100, 200},
+        {100: 10, 200: 20},
+    ])
+    def test_size_invalid_type(self, size):
+        with pytest.raises(TypeError):
             Variation(size)
 
+    @pytest.mark.parametrize('size', [
+        (),
+        [],
+        (100,),
+        [10, -1.6],
+        (-100, -200),
+        ('-100', '200'),
+        [100, 200, 300],
+    ])
+    def test_size_invalid_value(self, size):
+        with pytest.raises(ValueError):
+            Variation(size)
+
+    @pytest.mark.parametrize('size', [
+        (0, 0),
+        (100, 200),
+        ('100', '200'),
+        [100, 200],
+        ['100', '200'],
+        (100.6, 200.7),
+        (x for x in [100, 200]),
+    ])
+    def test_valid_sizes(self, size):
+        Variation(size)
+
+    def test_size_properties(self):
         v = Variation(['123', 456.6])
-        self.assertEqual(v.width, 123)
-        self.assertEqual(v.height, 456)
+        assert v.width == 123
+        assert v.height == 456
 
-    def test_variation_limits(self):
-        type_error_limits = [
-            {'max_width': 'a'},
-            {'max_width': [0, 200]},
-            {'max_height': 'b'},
-            {'max_height': [10, 50]},
-        ]
+    @pytest.mark.parametrize('limits', [
+        {'max_width': 'a'},
+        {'max_width': [0, 200]},
+        {'max_height': 'b'},
+        {'max_height': [10, 50]},
+    ])
+    def test_limits_invalid_type(self, limits):
+        with pytest.raises(TypeError):
+            Variation([100, 100], **limits)
 
-        value_error_limits = [
-            {'max_width': '-100'},
-            {'max_height': '-100'},
-        ]
+    @pytest.mark.parametrize('limits', [
+        {'max_width': '-100'},
+        {'max_height': '-100'},
+    ])
+    def test_limits_invalid_value(self, limits):
+        with pytest.raises(ValueError):
+            Variation([100, 100], **limits)
 
-        pass_values = [
-            {'max_width': 100},
-            {'max_height': 200},
-            {'max_width': '0', 'max_height': 0},
-            {'max_width': '100', 'max_height': 200},
-        ]
+    @pytest.mark.parametrize('limits', [
+        {'max_width': 100},
+        {'max_height': 200},
+        {'max_width': '0', 'max_height': 0},
+        {'max_width': '100', 'max_height': 200},
+    ])
+    def test_valid_limits(self, limits):
+        Variation([100, 100], **limits)
 
-        for limits in type_error_limits:
-            with self.assertRaises(TypeError):
-                Variation([100, 100], **limits)
-
-        for limits in value_error_limits:
-            with self.assertRaises(ValueError):
-                Variation([100, 100], **limits)
-
-        for limits in pass_values:
-            Variation([0, 0], clip=False, **limits)
-
-        v = Variation([0, 0], clip=False, max_width=350, max_height=450.75)
-        self.assertEqual(v.max_width, 350)
-        self.assertEqual(v.max_height, 450)
+    def test_limits_properties(self):
+        v = Variation([100, 100], max_width=350, max_height=450.75)
+        assert v.max_width == 350
+        assert v.max_height == 450
 
     def test_variation_copy(self):
         v = Variation(
@@ -94,71 +143,58 @@ class TestVariationInit(unittest.TestCase):
             clip=False,
             max_width=350,
             max_height=450.75,
-            preprocessors=[
-                processors.Crop(
-                    width=200,
-                    height=120,
-                    x=50,
-                    y=50
-                )
-            ],
-            postprocessors=[
-                processors.ColorOverlay('#0000FF', 0.10)
-            ],
-            extra=dict(
-                key='SomeWhat',
-                inner_list=[1, 2, 3]
-            )
+            preprocessors=[processors.Crop(width=200, height=120, x=50, y=50)],
+            postprocessors=[processors.ColorOverlay('#0000FF', 0.10)],
+            extra=dict(key='SomeWhat', inner_list=[1, 2, 3]),
         )
 
         clone = v.copy()
-        self.assertIsNot(clone, v)
-        self.assertIsNot(clone.preprocessors, v.preprocessors)
-        self.assertIsNot(clone.postprocessors, v.postprocessors)
-        self.assertIsNot(clone.extra_context, v.extra_context)
-        self.assertIsNot(
-            clone.extra_context['extra']['inner_list'],
-            v.extra_context['extra']['inner_list']
+        assert clone is not v
+        assert clone.preprocessors is not v.preprocessors
+        assert clone.postprocessors is not v.postprocessors
+        assert clone.extra_context is not v.extra_context
+        assert (
+            clone.extra_context['extra']['inner_list']
+            is not v.extra_context['extra']['inner_list']
         )
 
-    def test_variation_anchor(self):
-        type_error_anchor = [
-            1,
-            {0.10, 0.14},
-            'xxx',
-            '0, 0',
-        ]
-
-        value_error_anchor = [
-            (),
-            [0, 0, 0],
-            (0, 0, 0),
-        ]
-
-        pass_values = [
-            'c',
-            'tl',
-            [0.12, '0.8'],
-            (0, 0.15),
-            ('1', '0.75'),
-        ]
-
-        for anchor in type_error_anchor:
-            with self.assertRaises(TypeError):
-                Variation([100, 100], anchor=anchor)
-
-        for anchor in value_error_anchor:
-            with self.assertRaises(ValueError):
-                Variation([100, 100], anchor=anchor)
-
-        for anchor in pass_values:
+    @pytest.mark.parametrize('anchor', [
+        1,
+        {0.10, 0.14},
+        'xxx',
+        '0, 0',
+        ['one', 2]
+    ])
+    def test_anchor_invalid_type(self, anchor):
+        with pytest.raises(TypeError):
             Variation([100, 100], anchor=anchor)
 
+    @pytest.mark.parametrize('anchor', [
+        (),
+        (-8, 2),
+        [0, 0, 0],
+        (0, 0, 0),
+    ])
+    def test_anchor_invalid_type(self, anchor):
+        with pytest.raises(ValueError):
+            Variation([100, 100], anchor=anchor)
+
+    @pytest.mark.parametrize('anchor', [
+        'c',
+        'tl',
+        [0.12, '0.8'],
+        (0, 0.15),
+        ('1', '0.75'),
+    ])
+    def test_valid_anchor(self, anchor):
+        Variation([100, 100], anchor=anchor)
+
+    def test_anchor_property(self):
         v = Variation([100, 200])
-        self.assertEqual(v.anchor, (0.5, 0.5))
+        assert v.anchor == (0.5, 0.5)
 
         v = Variation([100, 200], anchor='TL')
-        self.assertEqual(v.anchor, (0, 0))
+        assert v.anchor == (0, 0)
 
         v = Variation([100, 200], anchor=[0.1, 0.75])
-        self.assertEqual(v.anchor, (0.1, 0.75))
+        assert v.anchor == (0.1, 0.75)

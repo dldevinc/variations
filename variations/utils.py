@@ -1,13 +1,15 @@
 import posixpath
-from typing import IO, Union, Optional, Dict, Any, Sequence
 from collections import namedtuple
-from pilkit import utils
+from typing import Any, Dict, Optional
+
 from pilkit.lib import Image
+
 from . import conf
-from . import processors
+from .processors import Transpose
+from .typing import Color, FilePtr, Size
 
 
-def guess_format(fp: Union[str, IO]) -> Optional[str]:
+def guess_format(fp: FilePtr) -> Optional[str]:
     """
     Определение формата изображение по расширению файла.
     """
@@ -16,13 +18,13 @@ def guess_format(fp: Union[str, IO]) -> Optional[str]:
     elif hasattr(fp, 'name'):
         filename = fp.name
     else:
-        return
+        return None
 
     ext = posixpath.splitext(filename)[1].lower()
     try:
         return Image.EXTENSION[ext]
     except KeyError:
-        pass
+        return None
 
 
 def get_preferred_extension(format: str) -> str:
@@ -45,14 +47,14 @@ def replace_extension(path: str, format: str) -> str:
     return ''.join((root, preferred_extension))
 
 
-def apply_exif(img: Image, info: Dict[str, Any] = None) -> Image:
+def apply_exif_orientation(img: Image, info: Dict[str, Any] = None) -> Image:
     """
     Применение ориентации, указанной в EXIF-данных.
     """
     from PIL.JpegImagePlugin import _getexif
 
     if info:
-        obj = namedtuple('FakeImage', 'info')(info=info)
+        obj = namedtuple('FakeImage', ['info'])(info)
     else:
         obj = img
 
@@ -64,40 +66,26 @@ def apply_exif(img: Image, info: Dict[str, Any] = None) -> Image:
     if orientation is None:
         return img
 
-    ops = processors.Transpose._EXIF_ORIENTATION_STEPS[orientation]
+    ops = Transpose._EXIF_ORIENTATION_STEPS[orientation]
     for method in ops:
-        img = processors.Transpose(method).process(img)
+        img = Transpose(method).process(img)
     return img
 
 
-def reset_transparency(img: Image, color: Union[str, Sequence] = '#FFFFFF', format: str = None) -> Image:
+def make_opaque(img: Image, color: Color = '#FFFFFF') -> Image:
     """
     Замена RGB-составляющей полностью прозрачных пикселей на указанный цвет.
     """
-    format = format or img.format
-    if format is None:
-        return img
-    else:
-        format = format.upper()
-
-    if img.mode == 'RGBA':
-        if format not in utils.RGBA_TRANSPARENCY_FORMATS:
-            return img
-    elif img.mode == 'P':
-        if format not in utils.PALETTE_TRANSPARENCY_FORMATS:
-            return img
-    else:
-        return img
-
     img = img.convert('RGBA')
-    overlay = Image.new('RGB', img.size, color)
-    mask = img.getchannel('A')
-    return Image.composite(img, overlay, mask)
+    overlay = Image.new('RGBA', img.size, color)
+    return Image.alpha_composite(overlay, img)
 
 
-def prepare_image(img: Image, draft_size: Sequence[int] = None, background_color: Union[str, Sequence] = None) -> Image:
+def prepare_image(
+    img: Image, draft_size: Size = None, background_color: Color = None,
+) -> Image:
     """
-    1) Эффекивно уменьшает изображение методом Image.draft() для экономии памяти
+    1) Эффективно уменьшает изображение методом Image.draft() для экономии памяти
        при обработке больших картинок.
     2) Примененяет ориентацию картинки, указанную в EXIF-данных
     3) Заливка RGB-данных в прозрачных пикселях указанным цветом во избежание
@@ -107,9 +95,8 @@ def prepare_image(img: Image, draft_size: Sequence[int] = None, background_color
     if draft_size is not None and format == 'JPEG':
         img.draft(img.mode, draft_size)
     if format in {'JPEG', 'TIFF'}:
-        img = apply_exif(img)
+        img = apply_exif_orientation(img)
 
-    # TODO: перепроверить необходимость
-    if background_color is not None and img.mode in ('RGBA', 'P'):
-        img = reset_transparency(img, background_color, format=format)
+    if background_color is not None:
+        img = make_opaque(img, background_color)
     return img

@@ -1,13 +1,14 @@
 import os
-import unittest
+
 from pilkit.lib import Image
 from variations import processors
-from variations.variation import Variation
 from variations.utils import prepare_image, replace_extension
+from variations.variation import Variation
+
 from . import helper
 
 
-class TestVariationProcess(unittest.TestCase):
+class TestVariationProcess:
     CLIP = True
     NOCLIP = False
     UPSCALE = True
@@ -60,8 +61,8 @@ class TestVariationProcess(unittest.TestCase):
                 (200, 800): (200, 800),
                 (400, 500): (400, 500),
                 (400, 1000): (400, 1000),
-            }
-        }
+            },
+        },
     }
 
     def _process_variation(self, img, dirname, filename, clip, upscale):
@@ -69,214 +70,183 @@ class TestVariationProcess(unittest.TestCase):
         fileroot, ext = os.path.splitext(filename)
 
         def process(variation, folder):
-            output_dir = os.path.join(helper.OUTPUT_PATH, dirname, folder)
-            if not os.path.isdir(output_dir):
-                os.makedirs(output_dir)
+            output_path = os.path.join(
+                helper.OUTPUT_PATH, dirname, folder, output_filename
+            )
+            helper.ensure_folder(output_path)
 
-            with self.subTest(output_filename):
-                self.assertEqual(variation.get_output_size(source_size), canvas)
+            assert variation.get_output_size(source_size) == canvas
+            new_img = variation.process(img)
+            assert new_img.size == canvas
 
-                new_img = variation.process(img)
-                self.assertEqual(new_img.size, canvas)
+            variation.save(new_img, output_path)
 
-                output_path = os.path.join(output_dir, output_filename)
-                variation.save(new_img, output_path)
-
-                # check output
-                result_path = os.path.join(helper.OUTPUT_PATH, dirname, folder, output_filename)
-                target_path = os.path.join(helper.TARGET_PATH, dirname, folder, output_filename)
-                self.assertIsNone(helper.image_diff(result_path, target_path))
+            # check output
+            target_path = os.path.join(
+                helper.TARGET_PATH, dirname, folder, output_filename
+            )
+            assert helper.image_diff(output_path, target_path) is None
 
         for size, canvas in self.SIZE_MAP[clip][upscale].items():
             filename_params = [
                 fileroot,
                 'x'.join(map(str, size)),
                 'noclip' if not clip else '',
-                'upscale' if upscale else ''
+                'upscale' if upscale else '',
             ]
             output_filename = ','.join(p for p in filename_params if p) + ext
 
-            plain_variation = Variation(
-                size=size,
-                clip=clip,
-                upscale=upscale,
-            )
+            plain_variation = Variation(size=size, clip=clip, upscale=upscale,)
             overlay_variation = plain_variation.copy()
-            overlay_variation.postprocessors.append(processors.ColorOverlay('#0000FF', 0.10))
+            overlay_variation.postprocessors.append(
+                processors.ColorOverlay('#0000FF', 0.10)
+            )
 
             process(plain_variation, 'plain')
             process(overlay_variation, 'overlay')
 
-    def _test_format(self, dirname):
+    def _test_file(self, dirname, filename):
         path = os.path.join(helper.INPUT_PATH, dirname)
-        for filename in os.listdir(path):
-            with open(os.path.join(path, filename), 'rb') as fp:
-                img = Image.open(fp)
-                img = prepare_image(img)
-                self._process_variation(img, dirname, filename, self.CLIP, self.NOUPSCALE)
-                self._process_variation(img, dirname, filename, self.CLIP, self.UPSCALE)
-                self._process_variation(img, dirname, filename, self.NOCLIP, self.NOUPSCALE)
-                self._process_variation(img, dirname, filename, self.NOCLIP, self.UPSCALE)
+        with open(os.path.join(path, filename), 'rb') as fp:
+            img = Image.open(fp)
+            img = prepare_image(img)
+            self._process_variation(img, dirname, filename, self.CLIP, self.NOUPSCALE)
+            self._process_variation(img, dirname, filename, self.CLIP, self.UPSCALE)
+            self._process_variation(img, dirname, filename, self.NOCLIP, self.NOUPSCALE)
+            self._process_variation(img, dirname, filename, self.NOCLIP, self.UPSCALE)
 
-    def test_jpeg(self):
-        self._test_format('jpg')
+    def test_jpeg(self, jpeg_image_filename):
+        self._test_file('jpg', jpeg_image_filename)
 
-    def test_png(self):
-        self._test_format('png')
+    def test_png(self, png_image_filename):
+        self._test_file('png', png_image_filename)
 
-    def test_gif(self):
-        self._test_format('gif')
+    def test_gif(self, gif_image_filename):
+        self._test_file('gif', gif_image_filename)
 
-    def test_webp(self):
-        self._test_format('webp')
+    def test_webp(self, webp_image_filename):
+        self._test_file('webp', webp_image_filename)
 
 
-class TestExifOrientation(unittest.TestCase):
-    def test_variation_exif(self):
+class TestExifOrientation:
+    def test_variation_exif(self, exif_image_filename):
+        variation = Variation(size=(1024, 768), clip=False, upscale=True,)
         path = os.path.join(helper.INPUT_PATH, 'exif')
-        for filename in os.listdir(path):
-            variation = Variation(
-                size=(1024, 768),
-                clip=False,
-                upscale=True,
-            )
-            with open(os.path.join(path, filename), 'rb') as fp:
-                img = Image.open(fp)
-                img = prepare_image(img)
-                new_img = variation.process(img)
+        with open(os.path.join(path, exif_image_filename), 'rb') as fp:
+            img = Image.open(fp)
+            img = prepare_image(img)
+            new_img = variation.process(img)
 
-                output_path = os.path.join(helper.OUTPUT_PATH, 'exif')
-                if not os.path.isdir(output_path):
-                    os.makedirs(output_path)
+            output_path = os.path.join(helper.OUTPUT_PATH, 'exif', exif_image_filename)
+            helper.ensure_folder(output_path)
 
-                variation.save(new_img, os.path.join(output_path, filename))
+            variation.save(new_img, output_path)
 
-        # check output
-        for filename in os.listdir(path):
-            with self.subTest(filename):
-                result_path = os.path.join(helper.OUTPUT_PATH, 'exif', filename)
-                target_path = os.path.join(helper.TARGET_PATH, 'exif', filename)
-                self.assertIsNone(helper.image_diff(result_path, target_path))
+            # check output
+            target_path = os.path.join(helper.TARGET_PATH, 'exif', exif_image_filename)
+            assert helper.image_diff(output_path, target_path) is None
 
 
-class TestFilters(unittest.TestCase):
-    def _test_filter(self, folder, postprocessors=()):
-        path = os.path.join(helper.INPUT_PATH, 'filters')
-        for filename in sorted(os.listdir(path)):
-            variation = Variation(
-                size=(0, 0),
-                postprocessors=postprocessors
-            )
-            with open(os.path.join(path, filename), 'rb') as fp:
-                img = Image.open(fp)
-                img = prepare_image(img)
-                new_img = variation.process(img)
+class TestFilters:
+    def _test_filter(self, dirname, filename, postprocessors=()):
+        variation = Variation(size=(0, 0), postprocessors=postprocessors)
+        input_path = os.path.join(helper.INPUT_PATH, 'filters', filename)
+        with open(input_path, 'rb') as fp:
+            img = Image.open(fp)
+            img = prepare_image(img)
+            new_img = variation.process(img)
 
-                output_path = os.path.join(helper.OUTPUT_PATH, 'filters', folder)
-                if not os.path.isdir(output_path):
-                    os.makedirs(output_path)
+            output_path = os.path.join(helper.OUTPUT_PATH, 'filters', dirname, filename)
+            helper.ensure_folder(output_path)
 
-                variation.save(new_img, os.path.join(output_path, filename))
+            variation.save(new_img, output_path)
 
-        # check output
-        for filename in sorted(os.listdir(path)):
-            with self.subTest(filename):
-                result_path = os.path.join(helper.OUTPUT_PATH, 'filters', folder, filename)
-                target_path = os.path.join(helper.TARGET_PATH, 'filters', folder, filename)
-                self.assertIsNone(helper.image_diff(result_path, target_path))
+            # check output
+            target_path = os.path.join(helper.TARGET_PATH, 'filters', dirname, filename)
+            assert helper.image_diff(output_path, target_path) is None
 
-    def test_grayscale(self):
-        self._test_filter('grayscale', [
-            processors.Grayscale()
-        ])
+    def test_grayscale(self, filter_image_filename):
+        self._test_filter('grayscale', filter_image_filename, [processors.Grayscale()])
 
-    def test_posterize(self):
-        self._test_filter('posterize', [
-            processors.MakeOpaque(),
-            processors.Posterize(4),
-        ])
+    def test_posterize(self, filter_image_filename):
+        self._test_filter(
+            'posterize',
+            filter_image_filename,
+            [processors.MakeOpaque(), processors.Posterize(4)],
+        )
 
-    def test_solarize(self):
-        self._test_filter('solarize', [
-            processors.MakeOpaque(),
-            processors.Solarize(),
-        ])
+    def test_solarize(self, filter_image_filename):
+        self._test_filter(
+            'solarize',
+            filter_image_filename,
+            [processors.MakeOpaque(), processors.Solarize()],
+        )
 
-    def test_blur(self):
-        self._test_filter('blur', [
-            processors.Blur(),
-        ])
+    def test_blur(self, filter_image_filename):
+        self._test_filter('blur', filter_image_filename, [processors.Blur()])
 
-    def test_sharpen(self):
-        self._test_filter('sharpen', [
-            processors.Sharpen(),
-        ])
+    def test_sharpen(self, filter_image_filename):
+        self._test_filter('sharpen', filter_image_filename, [processors.Sharpen()])
 
-    def test_smooth(self):
-        self._test_filter('smooth', [
-            processors.Smooth(),
-        ])
+    def test_smooth(self, filter_image_filename):
+        self._test_filter('smooth', filter_image_filename, [processors.Smooth()])
 
-    def test_edge_enchance(self):
-        self._test_filter('edge_enchance', [
-            processors.EdgeEnhance(),
-        ])
+    def test_edge_enchance(self, filter_image_filename):
+        self._test_filter(
+            'edge_enchance', filter_image_filename, [processors.EdgeEnhance()]
+        )
 
-    def test_unsharp_mask(self):
-        self._test_filter('unsharp_mask', [
-            processors.UnsharpMask(),
-        ])
+    def test_unsharp_mask(self, filter_image_filename):
+        self._test_filter(
+            'unsharp_mask', filter_image_filename, [processors.UnsharpMask()]
+        )
 
-    def test_box_blur(self):
-        self._test_filter('box_blur', [
-            processors.BoxBlur(10),
-        ])
+    def test_box_blur(self, filter_image_filename):
+        self._test_filter('box_blur', filter_image_filename, [processors.BoxBlur(10)])
 
-    def test_gaussian_blur(self):
-        self._test_filter('gaussian_blur', [
-            processors.GaussianBlur(10),
-        ])
+    def test_gaussian_blur(self, filter_image_filename):
+        self._test_filter(
+            'gaussian_blur', filter_image_filename, [processors.GaussianBlur(10)]
+        )
 
-    def test_stack_blur(self):
+    def test_stack_blur(self, filter_image_filename):
         if processors.STACK_BLUR_SUPPORT:
-            self._test_filter('stack_blur', [
-                processors.StackBlur(10),
-            ])
+            self._test_filter(
+                'stack_blur', filter_image_filename, [processors.StackBlur(10)]
+            )
 
-    def test_custom(self):
+    def test_custom(self, filter_image_filename):
         if not processors.STACK_BLUR_SUPPORT:
             return
 
-        path = os.path.join(helper.INPUT_PATH, 'filters')
-        for filename in sorted(os.listdir(path)):
-            variation = Variation(
-                size=(120, 80),
-                face_detection=True,
-                format='webp',
-                webp=dict(
-                    quality=0,
-                ),
-                preprocessors=[
-                    processors.MakeOpaque(),
-                ],
-                postprocessors=[
-                    processors.StackBlur(8),
-                ]
+        variation = Variation(
+            size=(120, 80),
+            face_detection=True,
+            format='webp',
+            webp=dict(quality=0,),
+            preprocessors=[processors.MakeOpaque()],
+            postprocessors=[processors.StackBlur(8)],
+        )
+        input_path = os.path.join(helper.INPUT_PATH, 'filters', filter_image_filename)
+        with open(input_path, 'rb') as fp:
+            img = Image.open(fp)
+            img = prepare_image(img)
+            new_img = variation.process(img)
+
+            output_path = os.path.join(
+                helper.OUTPUT_PATH, 'filters/custom', filter_image_filename
             )
-            with open(os.path.join(path, filename), 'rb') as fp:
-                img = Image.open(fp)
-                img = prepare_image(img)
-                new_img = variation.process(img)
+            output_path = variation.replace_extension(output_path)
+            helper.ensure_folder(output_path)
 
-                output_path = os.path.join(helper.OUTPUT_PATH, 'filters/custom')
-                if not os.path.isdir(output_path):
-                    os.makedirs(output_path)
-
-                output_filename = variation.replace_extension(os.path.join(output_path, filename))
-                variation.save(new_img, output_filename)
+            variation.save(new_img, output_path)
 
             # check output
-            with self.subTest(filename):
-                result_path = replace_extension(os.path.join(helper.OUTPUT_PATH, 'filters/custom', filename), 'webp')
-                target_path = replace_extension(os.path.join(helper.TARGET_PATH, 'filters/custom', filename), 'webp')
-                self.assertIsNone(helper.image_diff(result_path, target_path))
+            target_path = replace_extension(
+                os.path.join(
+                    helper.TARGET_PATH, 'filters/custom', filter_image_filename
+                ),
+                'webp',
+            )
+            helper.ensure_folder(target_path)
+            assert helper.image_diff(output_path, target_path) is None
