@@ -2,7 +2,7 @@
 A simple interface that allows processing images.
 
 ## Compatibility
-* `python` >= 3.4
+* `python` >= 3.5
 
 ## Installation
 1. Run `pip install variations`
@@ -50,9 +50,9 @@ A simple interface that allows processing images.
 ## Options
 |                    | Type                 | Examples                                                  | Description                                                                                                                                              |
 |--------------------|----------------------|-----------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------|
-| **size**           | tuple<br>list        | `(640, 480)`<br>`(640, 0)`                                | The **canvas** size of image. If you set the width or height to zero,  the corresponding value will be automatically adjusted based on  the aspect ratio |
-| **max_width**      | int                  | `640`                                                     | It specifies the maximim width in pixels.This option have meaning only when corresponding value in `size` is zero                                        |
-| **max_height**     | int                  | `480`                                                     | It specifies the maximim height in pixels.This option have meaning only when corresponding value in `size` is zero                                       |
+| **size**           | tuple<br>list        | `(640, 480)`<br>`(640, 0)`                                | The **canvas** size of image. If you set the width or height to zero, the corresponding value will be automatically adjusted based on the aspect ratio   |
+| **max_width**      | int                  | `640`                                                     | It specifies the maximum width in pixels.This option have meaning only when corresponding value in `size` is zero                                        |
+| **max_height**     | int                  | `480`                                                     | It specifies the maximum height in pixels.This option have meaning only when corresponding value in `size` is zero                                       |
 | **clip**           | bool                 |                                                           | When set to `True`, the image can be cropped when filling the canvas.                                                                                    |
 | **upscale**        | bool                 |                                                           | When set to `True`, the image can be upscaled when filling the canvas.                                                                                   |
 | **anchor**         | str<br>tuple<br>list | `'tr'` (top right)<br>`'c'` (center)<br>`(1, 1)` (bottom right) | Defines the anchor point.                                                                                                                          |
