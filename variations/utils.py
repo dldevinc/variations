@@ -1,13 +1,15 @@
 import posixpath
 from collections import namedtuple
-from typing import IO, Any, Dict, Optional, Sequence, Union
+from typing import Any, Dict, Optional
 
 from pilkit.lib import Image
 
-from . import conf, processors
+from . import conf
+from .processors import Transpose
+from .typing import Color, FilePtr, Size
 
 
-def guess_format(fp: Union[str, IO]) -> Optional[str]:
+def guess_format(fp: FilePtr) -> Optional[str]:
     """
     Определение формата изображение по расширению файла.
     """
@@ -16,13 +18,13 @@ def guess_format(fp: Union[str, IO]) -> Optional[str]:
     elif hasattr(fp, 'name'):
         filename = fp.name
     else:
-        return
+        return None
 
     ext = posixpath.splitext(filename)[1].lower()
     try:
         return Image.EXTENSION[ext]
     except KeyError:
-        pass
+        return None
 
 
 def get_preferred_extension(format: str) -> str:
@@ -52,7 +54,7 @@ def apply_exif_orientation(img: Image, info: Dict[str, Any] = None) -> Image:
     from PIL.JpegImagePlugin import _getexif
 
     if info:
-        obj = namedtuple('FakeImage', 'info')(info=info)
+        obj = namedtuple('FakeImage', ['info'])(info)
     else:
         obj = img
 
@@ -64,13 +66,13 @@ def apply_exif_orientation(img: Image, info: Dict[str, Any] = None) -> Image:
     if orientation is None:
         return img
 
-    ops = processors.Transpose._EXIF_ORIENTATION_STEPS[orientation]
+    ops = Transpose._EXIF_ORIENTATION_STEPS[orientation]
     for method in ops:
-        img = processors.Transpose(method).process(img)
+        img = Transpose(method).process(img)
     return img
 
 
-def make_opaque(img: Image, color: Union[str, Sequence] = '#FFFFFF') -> Image:
+def make_opaque(img: Image, color: Color = '#FFFFFF') -> Image:
     """
     Замена RGB-составляющей полностью прозрачных пикселей на указанный цвет.
     """
@@ -80,9 +82,7 @@ def make_opaque(img: Image, color: Union[str, Sequence] = '#FFFFFF') -> Image:
 
 
 def prepare_image(
-    img: Image,
-    draft_size: Sequence[int] = None,
-    background_color: Union[str, Sequence] = None,
+    img: Image, draft_size: Size = None, background_color: Color = None,
 ) -> Image:
     """
     1) Эффективно уменьшает изображение методом Image.draft() для экономии памяти

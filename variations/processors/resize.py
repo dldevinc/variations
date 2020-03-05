@@ -1,6 +1,9 @@
 import logging
 
-from pilkit.processors.resize import *
+from pilkit.processors.resize import (
+    Resize, ResizeToCover, ResizeToFill, SmartResize, ResizeCanvas, AddBorder,
+    ResizeToFit, Thumbnail
+)
 
 __all__ = [
     'Resize',
@@ -18,7 +21,7 @@ __all__ = [
 class FaceDetectionResizeToFill(ResizeToFill):
     """
     Добавление функции определения лиц.
-    TODO: плохо, что приходится расширять процессор таким ради подмены anchor.
+    TODO: плохо, что приходится расширять процессор подобным образом ради подмены anchor.
     """
 
     def __init__(self, *args, face_detection=False, **kwargs):

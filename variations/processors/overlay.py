@@ -1,10 +1,4 @@
-from pilkit.lib import ImageColor
-
-try:
-    # pilkit >= 2.0 compat
-    from pilkit.processors.overlay import *
-except ImportError:
-    pass
+from pilkit.lib import Image, ImageColor
 
 __all__ = ['ColorOverlay']
 

@@ -1,4 +1,11 @@
-from pilkit.processors.base import *
+from pilkit.lib import Image, ImageColor
+from pilkit.processors.base import (
+    Adjust,
+    Anchor,
+    ProcessorPipeline,
+    Reflection,
+    Transpose,
+)
 
 __all__ = [
     'ProcessorPipeline',

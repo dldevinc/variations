@@ -1,12 +1,13 @@
 import copy
 import logging
-from typing import BinaryIO, Iterable, Sequence, Tuple, Union
+from typing import Any, Dict, Iterable
 
 from pilkit.lib import Image
 from pilkit.utils import save_image
 
 from . import conf, processors, utils
 from .scaler import Scaler
+from .typing import FilePtr, Size
 
 
 class Variation:
@@ -14,7 +15,7 @@ class Variation:
 
     def __init__(
         self,
-        size: Sequence[int] = (0, 0),
+        size: Size = (0, 0),
         max_width: int = 0,
         max_height: int = 0,
         clip: bool = True,
@@ -68,11 +69,11 @@ class Variation:
         self._upscale = value
 
     @property
-    def size(self):
-        return self._size
+    def size(self) -> Size:
+        return self._size   # noqa
 
     @size.setter
-    def size(self, value):
+    def size(self, value: Size):
         error_msg = '"size" argument must be a sequence of two non-negative integers'
 
         # filter out some wrong types
@@ -80,17 +81,17 @@ class Variation:
             raise TypeError(error_msg)
 
         try:
-            value = tuple(int(item) for item in value)
+            formatted_value = tuple(int(item) for item in value)
         except (TypeError, ValueError):
             raise TypeError(error_msg)
 
-        if len(value) != 2:
+        if len(formatted_value) != 2:
             raise ValueError(error_msg)
 
-        if not all(i >= 0 for i in value):
+        if not all(i >= 0 for i in formatted_value):
             raise ValueError(error_msg)
 
-        self._size = value
+        self._size = formatted_value
 
     @property
     def width(self):
@@ -227,7 +228,7 @@ class Variation:
         return self._extra_context
 
     @extra_context.setter
-    def extra_context(self, value):
+    def extra_context(self, value: Dict[str, Any]):
         if not isinstance(value, dict):
             raise TypeError(value)
         self._extra_context = {k.lower(): v for k, v in value.items()}
@@ -235,7 +236,7 @@ class Variation:
     def copy(self):
         return copy.deepcopy(self)
 
-    def get_output_size(self, source_size: Sequence[int]) -> Tuple[int, int]:
+    def get_output_size(self, source_size: Size) -> Size:
         """
         Вычисление финальных размеров холста по размерам исходного изображения.
         """
@@ -273,7 +274,7 @@ class Variation:
                     size.set_height(max_height)
             return self.width or size.width, self.height or size.height
 
-    def get_processor(self, size: Sequence[int]) -> processors.ProcessorPipeline:
+    def get_processor(self, size: Size) -> processors.ProcessorPipeline:
         """
         Получение основного процессора вариации для указанного размера.
         """
@@ -320,7 +321,7 @@ class Variation:
         format = self.output_format(path)
         return utils.replace_extension(path, format)
 
-    def _detect_format(self, outfile: Union[BinaryIO, str]):
+    def _detect_format(self, outfile: FilePtr) -> str:
         if isinstance(outfile, str):
             return self.output_format(outfile)
         elif hasattr(outfile, 'name'):
@@ -330,7 +331,7 @@ class Variation:
         else:
             return conf.FALLBACK_FORMAT
 
-    def save(self, img: Image, outfile: Union[BinaryIO, str], **options):
+    def save(self, img: Image, outfile: FilePtr, **options):
         """
         Сохранение картинки в файл.
         """
@@ -341,7 +342,7 @@ class Variation:
         format = format.lower()
 
         # настройки для конкретного формата
-        format_options = {}
+        format_options = {}     # type: Dict[str, Any]
         format_options.update(self.extra_context.get(format, {}))
         for k, v in format_options.items():
             opts.setdefault(k, v)
