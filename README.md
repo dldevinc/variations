@@ -11,7 +11,7 @@ A simple interface that allows processing images.
     
     ``pip install pillow-stackblur``
 
-3 (**optional**) If you want to use [Face Detection](https://github.com/ageitgey/face_recognition)
+3. (**optional**) If you want to use [Face Detection](https://github.com/ageitgey/face_recognition)
 
     ``pip install face_recognition``
 
