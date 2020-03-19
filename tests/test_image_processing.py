@@ -224,7 +224,7 @@ class TestFilters:
             face_detection=True,
             format='webp',
             webp=dict(quality=0,),
-            preprocessors=[processors.MakeOpaque()],
+            preprocessors=[processors.MakeOpaque('#FFFF00')],
             postprocessors=[processors.StackBlur(8)],
         )
         input_path = os.path.join(helper.INPUT_PATH, 'filters', filter_image_filename)
