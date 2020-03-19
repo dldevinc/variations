@@ -175,7 +175,7 @@ class TestVariation:
         [0, 0, 0],
         (0, 0, 0),
     ])
-    def test_anchor_invalid_type(self, anchor):
+    def test_anchor_invalid_value(self, anchor):
         with pytest.raises(ValueError):
             Variation([100, 100], anchor=anchor)
 
