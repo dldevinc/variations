@@ -110,4 +110,4 @@ except ImportError:
     # prevent error when calling `pip install -e .`
     pass
 
-__version__ = "0.0.16"
+__version__ = "0.0.17"

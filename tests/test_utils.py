@@ -37,7 +37,7 @@ def test_replace_extension():
 
 @pytest.mark.parametrize('source_folder', ['png', 'jpg', 'gif', 'webp'])
 @pytest.mark.parametrize('format', ['png', 'jpeg', 'tiff', 'gif', 'webp'])
-def test_prepare_image(source_folder, format):
+def test_opaque_background(source_folder, format):
     input_folder = os.path.join(helper.INPUT_PATH, source_folder)
     for filename in sorted(os.listdir(input_folder)):
         input_path = os.path.join(input_folder, filename)
