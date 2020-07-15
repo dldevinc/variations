@@ -1,5 +1,7 @@
 # variations
-A simple interface that allows processing images.
+A simple interface that allows processing of images.
+
+![](https://travis-ci.org/dldevinc/variations.svg?branch=master)
 
 ## Compatibility
 * `python` >= 3.5
@@ -81,4 +83,14 @@ Variation(
         compression='tiff_jpeg',
     )
 )
+```
+
+## Development and Testing
+After cloning the Git repository, you should install this
+in a virtualenv and set up for development:
+```shell script
+virtualenv .venv
+source .venv/bin/activate
+pip install -r ./requirements_dev.txt
+pre-commit install
 ```

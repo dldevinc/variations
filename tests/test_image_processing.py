@@ -105,7 +105,7 @@ class TestVariationProcess:
             process(plain_variation, 'plain')
             process(overlay_variation, 'overlay')
 
-    def _test_file(self, dirname, filename):
+    def _test_files(self, dirname, filename):
         path = os.path.join(helper.INPUT_PATH, dirname)
         with open(os.path.join(path, filename), 'rb') as fp:
             img = Image.open(fp)
@@ -116,16 +116,16 @@ class TestVariationProcess:
             self._process_variation(img, dirname, filename, self.NOCLIP, self.UPSCALE)
 
     def test_jpeg(self, jpeg_image_filename):
-        self._test_file('jpg', jpeg_image_filename)
+        self._test_files('jpg', jpeg_image_filename)
 
     def test_png(self, png_image_filename):
-        self._test_file('png', png_image_filename)
+        self._test_files('png', png_image_filename)
 
     def test_gif(self, gif_image_filename):
-        self._test_file('gif', gif_image_filename)
+        self._test_files('gif', gif_image_filename)
 
     def test_webp(self, webp_image_filename):
-        self._test_file('webp', webp_image_filename)
+        self._test_files('webp', webp_image_filename)
 
 
 class TestExifOrientation:

@@ -35,8 +35,8 @@ def test_replace_extension():
     assert utils.replace_extension('image.jpg', 'mp3') == 'image.jpg'
 
 
-@pytest.mark.parametrize('source_folder', ['png', 'jpg', 'gif', 'webp'])
 @pytest.mark.parametrize('format', ['png', 'jpeg', 'tiff', 'gif', 'webp'])
+@pytest.mark.parametrize('source_folder', ['png', 'jpg', 'gif', 'webp'])
 def test_opaque_background(source_folder, format):
     input_folder = os.path.join(helper.INPUT_PATH, source_folder)
     for filename in sorted(os.listdir(input_folder)):
