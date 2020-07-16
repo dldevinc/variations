@@ -29,7 +29,7 @@ deploy:
   skip_existing: true
   user: __token__
   password:
-    secure: PLEASE_REPLACE_ME
+    secure: fPr4YYBEOxfgG7t6mmXLlwM2ip0uc1F3YnZqZyaQvogeGzWkEIVtqEbeE1b1bgEq27eglzTg0kOgKeb9dYPY2xeSIo1MeUi0OE023OdOWebOboB6EwuZjRlDbTve5d4gw7robPKVep6Xv7Grdz1yOBD9GLu6jt8ErUiBHAHlpDmm+4qGjczxNDxfb8yXjYJOEpP3ENBGmv3VeLpauEtY0idpUAQckVZQmSWYYH8a7kmQtxlxSkp2/TUzPc0XG63RFoem67S6wIOmG5DaqUkfNeDTDYiv6+5gAGrWotKmMAj/SQ7Uzj/MLzT3X1iLUwGkd6zEAfiJZOHUL1LW/Wp98yy98VTMd1nTI7oxC10Ety2qZtNtlv4IOyQzEIrWuue1gwXFm94f4rC85WPoqUaosXYeCqjqsXxMgl/uhGMtZLV0SQbRciMwZY7+FEyvtUFqd5DdtQWTrE+oSqZLWgXUsvzCzDhgm/zEH2aEjhNG6yM8ueJ6QgsI4+v8CKWfHHAmuT0jbYwDBbrruK7/I7FHVyUqrFqGaytIQHS97rBNQqXEjoL3bVx0e4UZN7qHC1j/xC5AU+MihTQFfroxiaoNmxfWdah+4s6Y5ekZSXa0g4mlFAprZS5S/EThtUKYcxC7RvN6vMtiLRKFITRNO1W876d6TnRPvPStzIVou9t2JUc=
   on:
     repo: dldevinc/variations
     condition: $TRAVIS_PYTHON_VERSION = 3.8
