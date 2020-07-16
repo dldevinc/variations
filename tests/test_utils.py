@@ -46,22 +46,19 @@ def test_replace_extension():
 @pytest.mark.parametrize('format', ['png', 'jpeg', 'tiff', 'gif', 'webp'])
 @pytest.mark.parametrize('source_folder', ['png', 'jpg', 'gif', 'webp'])
 def test_opaque_background(source_folder, format):
-    input_folder = os.path.join(helper.INPUT_PATH, source_folder)
-    for filename in sorted(os.listdir(input_folder)):
-        input_path = os.path.join(input_folder, filename)
-
-        output_path = os.path.join(
-            helper.OUTPUT_PATH, 'opaque', source_folder, format, filename
-        )
-        output_path = utils.replace_extension(output_path, format)
-        helper.ensure_folder(output_path)
-
+    input_folder = helper.INPUT_PATH / source_folder
+    for input_path in sorted(input_folder.iterdir()):
         original = Image.open(input_path)
         img = utils.prepare_image(original, background_color=(255, 0, 0, 128))
+
+        relative_path = Path('opaque') / source_folder / format / input_path.relative_to(input_folder)
+        output_path = helper.OUTPUT_PATH / relative_path
+        if not output_path.parent.is_dir():
+            output_path.parent.mkdir(parents=True)
+
+        output_path = utils.replace_extension(output_path, format)
         save_image(img, output_path, format=format)
 
-        target_path = os.path.join(
-            helper.TARGET_PATH, 'opaque', source_folder, format, filename
-        )
+        target_path = helper.TARGET_PATH / relative_path
         target_path = utils.replace_extension(target_path, format)
         assert helper.image_diff(output_path, target_path) is None
