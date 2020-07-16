@@ -1,8 +1,14 @@
 import logging
 
 from pilkit.processors.resize import (
-    Resize, ResizeToCover, ResizeToFill, SmartResize, ResizeCanvas, AddBorder,
-    ResizeToFit, Thumbnail
+    AddBorder,
+    Resize,
+    ResizeCanvas,
+    ResizeToCover,
+    ResizeToFill,
+    ResizeToFit,
+    SmartResize,
+    Thumbnail,
 )
 
 __all__ = [

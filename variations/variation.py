@@ -71,7 +71,7 @@ class Variation:
 
     @property
     def size(self) -> Size:
-        return self._size   # noqa
+        return self._size  # noqa
 
     @size.setter
     def size(self, value: Size):
@@ -343,7 +343,7 @@ class Variation:
         format = format.lower()
 
         # настройки для конкретного формата
-        format_options = {}     # type: Dict[str, Any]
+        format_options = {}  # type: Dict[str, Any]
         format_options.update(self.extra_context.get(format, {}))
         for k, v in format_options.items():
             opts.setdefault(k, v)

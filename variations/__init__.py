@@ -105,6 +105,7 @@
 # загрузка всех плагинов PIL
 try:
     from PIL import Image
+
     Image.init()
 except ImportError:
     # prevent error when calling `pip install -e .`
