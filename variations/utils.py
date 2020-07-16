@@ -1,6 +1,7 @@
 import posixpath
 from collections import namedtuple
-from typing import Any, Dict, Optional
+from pathlib import Path
+from typing import Any, Dict, Optional, Union
 
 from pilkit.lib import Image
 
@@ -13,7 +14,7 @@ def guess_format(fp: FilePtr) -> Optional[str]:
     """
     Определение формата изображение по расширению файла.
     """
-    if isinstance(fp, (bytes, str)):
+    if isinstance(fp, (str, Path)):
         filename = fp
     elif hasattr(fp, 'name'):
         filename = fp.name
@@ -34,10 +35,12 @@ def get_preferred_extension(format: str) -> str:
     return conf.PREFERRED_EXTENSIONS[format.upper()]
 
 
-def replace_extension(path: str, format: str) -> str:
+def replace_extension(path: Union[str, Path], format: str) -> str:
     """
     Замена расширения файла в пути path на наиболее подходящее для формата format.
     """
+    path = str(path)
+
     try:
         preferred_extension = get_preferred_extension(format)
     except KeyError:

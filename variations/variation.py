@@ -1,6 +1,7 @@
 import copy
 import logging
-from typing import Any, Dict, Iterable
+from pathlib import Path
+from typing import Any, Dict, Iterable, Union
 
 from pilkit.lib import Image
 from pilkit.utils import save_image
@@ -305,7 +306,7 @@ class Variation:
         """
         return self.get_processor(img.size).process(img)
 
-    def output_format(self, path: str) -> str:
+    def output_format(self, path: Union[str, Path]) -> str:
         """
         Определение итогового формата изображения.
         """
@@ -322,7 +323,7 @@ class Variation:
         return utils.replace_extension(path, format)
 
     def _detect_format(self, outfile: FilePtr) -> str:
-        if isinstance(outfile, str):
+        if isinstance(outfile, (str, Path)):
             return self.output_format(outfile)
         elif hasattr(outfile, 'name'):
             return self.output_format(outfile.name)
@@ -353,4 +354,4 @@ class Variation:
         else:
             autoconvert = opts.pop('autoconvert', True)
 
-        save_image(img, outfile, format=format, options=opts, autoconvert=autoconvert)
+        save_image(img, str(outfile), format=format, options=opts, autoconvert=autoconvert)
