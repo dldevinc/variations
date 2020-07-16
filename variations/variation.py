@@ -1,6 +1,7 @@
 import copy
 import logging
-from typing import Any, Dict, Iterable
+from pathlib import Path
+from typing import Any, Dict, Iterable, Union
 
 from pilkit.lib import Image
 from pilkit.utils import save_image
@@ -42,7 +43,7 @@ class Variation:
         # check face_recognition installed
         if self.face_detection:
             try:
-                import face_recognition
+                import face_recognition  # noqa
             except ImportError:
                 self.logger.warning(
                     "Cannot use face detection because 'face_recognition' is not installed."
@@ -70,7 +71,7 @@ class Variation:
 
     @property
     def size(self) -> Size:
-        return self._size   # noqa
+        return self._size  # type: ignore  # noqa
 
     @size.setter
     def size(self, value: Size):
@@ -236,11 +237,11 @@ class Variation:
     def copy(self):
         return copy.deepcopy(self)
 
-    def get_output_size(self, source_size: Size) -> Size:
+    def get_output_size(self, source_size: Size) -> Size:  # noqa
         """
         Вычисление финальных размеров холста по размерам исходного изображения.
         """
-        size = Scaler(*source_size, upscale=self.upscale)
+        size = Scaler(*source_size, upscale=self.upscale)  # type: ignore
         if self.clip:
             if self.upscale:
                 if self.width and self.width > size.width:
@@ -305,7 +306,7 @@ class Variation:
         """
         return self.get_processor(img.size).process(img)
 
-    def output_format(self, path: str) -> str:
+    def output_format(self, path: Union[str, Path]) -> str:
         """
         Определение итогового формата изображения.
         """
@@ -314,7 +315,7 @@ class Variation:
             format = utils.guess_format(path) or conf.FALLBACK_FORMAT
         return format
 
-    def replace_extension(self, path: str) -> str:
+    def replace_extension(self, path: Union[str, Path]) -> str:
         """
         Замена расширения файла в пути path в соответствии с вариацией.
         """
@@ -322,7 +323,7 @@ class Variation:
         return utils.replace_extension(path, format)
 
     def _detect_format(self, outfile: FilePtr) -> str:
-        if isinstance(outfile, str):
+        if isinstance(outfile, (str, Path)):
             return self.output_format(outfile)
         elif hasattr(outfile, 'name'):
             return self.output_format(outfile.name)
@@ -342,7 +343,7 @@ class Variation:
         format = format.lower()
 
         # настройки для конкретного формата
-        format_options = {}     # type: Dict[str, Any]
+        format_options = {}  # type: Dict[str, Any]
         format_options.update(self.extra_context.get(format, {}))
         for k, v in format_options.items():
             opts.setdefault(k, v)
@@ -353,4 +354,6 @@ class Variation:
         else:
             autoconvert = opts.pop('autoconvert', True)
 
-        save_image(img, outfile, format=format, options=opts, autoconvert=autoconvert)
+        save_image(
+            img, str(outfile), format=format, options=opts, autoconvert=autoconvert
+        )

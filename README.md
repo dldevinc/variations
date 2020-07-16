@@ -1,5 +1,7 @@
 # variations
-A simple interface that allows processing images.
+A simple interface that allows processing of images.
+
+![](https://travis-ci.org/dldevinc/variations.svg?branch=master)
 
 ## Compatibility
 * `python` >= 3.5
@@ -8,7 +10,7 @@ A simple interface that allows processing images.
 1. Run `pip install variations`
 
 2. (**optional**) If you want to use [StackBlur](https://github.com/dldevinc/pillow-stackblur)
-    
+
     ``pip install pillow-stackblur``
 
 3. (**optional**) If you want to use [Face Detection](https://github.com/ageitgey/face_recognition)
@@ -39,7 +41,7 @@ A simple interface that allows processing images.
             processors.ColorOverlay('#FF0000', overlay_opacity=0.25),
         ],
     )
-    
+
     img = Image.open('source.jpg')
     img = prepare_image(img, draft_size=variation.get_output_size(img.size))
     new_img = variation.process(img)
@@ -81,4 +83,14 @@ Variation(
         compression='tiff_jpeg',
     )
 )
+```
+
+## Development and Testing
+After cloning the Git repository, you should install this
+in a virtualenv and set up for development:
+```shell script
+virtualenv .venv
+source .venv/bin/activate
+pip install -r ./requirements_dev.txt
+pre-commit install
 ```

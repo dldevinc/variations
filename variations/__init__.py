@@ -105,9 +105,10 @@
 # загрузка всех плагинов PIL
 try:
     from PIL import Image
+
     Image.init()
 except ImportError:
     # prevent error when calling `pip install -e .`
     pass
 
-__version__ = "0.0.17"
+__version__ = "0.1.0"

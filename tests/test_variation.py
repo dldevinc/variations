@@ -1,4 +1,5 @@
 import io
+from pathlib import Path
 
 import pytest
 from pilkit import processors
@@ -51,6 +52,9 @@ class TestVariation:
         assert variation._detect_format('image.jpg') == 'JPEG'
         assert variation._detect_format('image.jpeg') == 'JPEG'
         assert variation._detect_format('image.mp3') == 'JPEG'
+
+        assert variation._detect_format(Path('image.jpg')) == 'JPEG'
+        assert variation._detect_format(Path('image.mp3')) == 'JPEG'
 
         with io.BytesIO() as file:
             assert variation._detect_format(file) == 'JPEG'  # FALLBACK_FORMAT

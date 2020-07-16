@@ -1,34 +1,39 @@
-import os
+from pathlib import Path
+
+import pytest
 
 from . import helper
 
 
+@pytest.fixture
+def input_files(request):
+    resolved_path = (Path(helper.INPUT_PATH) / request.param).resolve()
+    if resolved_path.is_dir():
+        sorted_files = sorted(file for file in resolved_path.iterdir() if file.is_file())
+        return [
+            file.relative_to(helper.INPUT_PATH)
+            for file in sorted_files
+        ]
+    else:
+        raise ValueError("invalid internal test config")
+
+
 def pytest_generate_tests(metafunc):
-    if "exif_image_filename" in metafunc.fixturenames:
-        input_folder = os.path.join(helper.INPUT_PATH, 'exif')
-        files = sorted(os.listdir(input_folder))
-        metafunc.parametrize("exif_image_filename", files)
-    elif "face_image_filename" in metafunc.fixturenames:
-        input_folder = os.path.join(helper.INPUT_PATH, 'faces')
-        files = sorted(os.listdir(input_folder))
-        metafunc.parametrize("face_image_filename", files)
-    elif "filter_image_filename" in metafunc.fixturenames:
-        input_folder = os.path.join(helper.INPUT_PATH, 'filters')
-        files = sorted(os.listdir(input_folder))
-        metafunc.parametrize("filter_image_filename", files)
-    elif "jpeg_image_filename" in metafunc.fixturenames:
-        input_folder = os.path.join(helper.INPUT_PATH, 'jpg')
-        files = sorted(os.listdir(input_folder))
-        metafunc.parametrize("jpeg_image_filename", files)
-    elif "png_image_filename" in metafunc.fixturenames:
-        input_folder = os.path.join(helper.INPUT_PATH, 'png')
-        files = sorted(os.listdir(input_folder))
-        metafunc.parametrize("png_image_filename", files)
-    elif "gif_image_filename" in metafunc.fixturenames:
-        input_folder = os.path.join(helper.INPUT_PATH, 'gif')
-        files = sorted(os.listdir(input_folder))
-        metafunc.parametrize("gif_image_filename", files)
-    elif "webp_image_filename" in metafunc.fixturenames:
-        input_folder = os.path.join(helper.INPUT_PATH, 'webp')
-        files = sorted(os.listdir(input_folder))
-        metafunc.parametrize("webp_image_filename", files)
+    if hasattr(metafunc.cls, 'input_files'):
+        if "input_file" in metafunc.fixturenames:
+            idlist = []
+            argvalues = []
+            for dirname in metafunc.cls.input_files:
+                resolved_path = (Path(helper.INPUT_PATH) / dirname).resolve()
+                if resolved_path.is_dir():
+                    sorted_files = sorted(file for file in resolved_path.iterdir() if file.is_file())
+                    argvalues.extend(
+                        file.relative_to(helper.INPUT_PATH)
+                        for file in sorted_files
+                    )
+
+            metafunc.parametrize(
+                'input_file',
+                argvalues,
+                ids=map(str, argvalues)
+            )

@@ -1,8 +1,14 @@
 import logging
 
 from pilkit.processors.resize import (
-    Resize, ResizeToCover, ResizeToFill, SmartResize, ResizeCanvas, AddBorder,
-    ResizeToFit, Thumbnail
+    AddBorder,
+    Resize,
+    ResizeCanvas,
+    ResizeToCover,
+    ResizeToFill,
+    ResizeToFit,
+    SmartResize,
+    Thumbnail,
 )
 
 __all__ = [
@@ -92,7 +98,7 @@ class FaceDetectionResizeToFill(ResizeToFill):
             return super().process(img)
 
         # overwrite anchor
-        original_anchor = self.anchor
+        original_anchor = self.anchor  # type: ignore
         self.anchor = self._get_new_anchor(img, rect)
         result = super().process(img)
         self.anchor = original_anchor
