@@ -1,3 +1,3 @@
-from pilkit.processors.crop import *
+from pilkit.processors.crop import Crop, SmartCrop, TrimBorderColor
 
-__all__ = ['TrimBorderColor', 'Crop', 'SmartCrop']
+__all__ = ['Crop', 'TrimBorderColor', 'SmartCrop']

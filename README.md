@@ -10,7 +10,7 @@ A simple interface that allows processing of images.
 1. Run `pip install variations`
 
 2. (**optional**) If you want to use [StackBlur](https://github.com/dldevinc/pillow-stackblur)
-    
+
     ``pip install pillow-stackblur``
 
 3. (**optional**) If you want to use [Face Detection](https://github.com/ageitgey/face_recognition)
@@ -41,7 +41,7 @@ A simple interface that allows processing of images.
             processors.ColorOverlay('#FF0000', overlay_opacity=0.25),
         ],
     )
-    
+
     img = Image.open('source.jpg')
     img = prepare_image(img, draft_size=variation.get_output_size(img.size))
     new_img = variation.process(img)

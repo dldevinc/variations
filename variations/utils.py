@@ -99,7 +99,6 @@ def prepare_image(
         img.draft(img.mode, draft_size)
     if format in {'JPEG', 'TIFF'}:
         img = apply_exif_orientation(img)
-
     if background_color is not None:
         img = make_opaque(img, background_color)
     return img

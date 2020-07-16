@@ -98,7 +98,7 @@ class FaceDetectionResizeToFill(ResizeToFill):
             return super().process(img)
 
         # overwrite anchor
-        original_anchor = self.anchor
+        original_anchor = self.anchor  # type: ignore
         self.anchor = self._get_new_anchor(img, rect)
         result = super().process(img)
         self.anchor = original_anchor

@@ -110,7 +110,7 @@ class GaussianBlur:
 
 if STACK_BLUR_SUPPORT:
 
-    class StackBlur:
+    class StackBlur:  # type: ignore
         def __init__(self, radius=2):
             self.radius = radius
 
