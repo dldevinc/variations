@@ -1,14 +1,14 @@
 import copy
 import logging
 from pathlib import Path
-from typing import Any, Dict, Iterable, Union
+from typing import Any, Dict, Iterable, cast
 
 from pilkit.lib import Image
 from pilkit.utils import save_image
 
 from . import conf, processors, utils
 from .scaler import Scaler
-from .typing import FilePtr, Size
+from .typing import FilePtr, PathLike, Size
 
 
 class Variation:
@@ -71,7 +71,7 @@ class Variation:
 
     @property
     def size(self) -> Size:
-        return self._size  # type: ignore  # noqa
+        return cast(Size, self._size)
 
     @size.setter
     def size(self, value: Size):
@@ -306,7 +306,7 @@ class Variation:
         """
         return self.get_processor(img.size).process(img)
 
-    def output_format(self, path: Union[str, Path]) -> str:
+    def output_format(self, path: PathLike) -> str:
         """
         Определение итогового формата изображения.
         """
@@ -315,7 +315,7 @@ class Variation:
             format = utils.guess_format(path) or conf.FALLBACK_FORMAT
         return format
 
-    def replace_extension(self, path: Union[str, Path]) -> str:
+    def replace_extension(self, path: PathLike) -> str:
         """
         Замена расширения файла в пути path в соответствии с вариацией.
         """
