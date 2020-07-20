@@ -20,34 +20,34 @@ A simple interface that allows processing of images.
 
 ## Usage
 ```python
-    from PIL import Image
-    from variations import processors
-    from variations.variation import Variation
-    from variations.utils import prepare_image
+from PIL import Image
+from variations import processors
+from variations.variation import Variation
+from variations.utils import prepare_image
 
-    variation = Variation(
-        size=(400, 0),
-        max_height=800,
-        clip=False,
-        upscale=False,
-        anchor=processors.Anchor.TOP_LEFT,
-        jpeg=dict(
-            quality=92,
-        ),
-        webp=dict(
-            lossless=True,
-            quality=90,
-        ),
-        postprocessors=[
-            processors.ColorOverlay('#FF0000', overlay_opacity=0.25),
-        ],
-    )
+variation = Variation(
+    size=(400, 0),
+    max_height=800,
+    clip=False,
+    upscale=False,
+    anchor=processors.Anchor.TOP_LEFT,
+    jpeg=dict(
+        quality=92,
+    ),
+    webp=dict(
+        lossless=True,
+        quality=90,
+    ),
+    postprocessors=[
+        processors.ColorOverlay('#FF0000', overlay_opacity=0.25),
+    ],
+)
 
-    img = Image.open('source.jpg')
-    img = prepare_image(img, draft_size=variation.get_output_size(img.size))
-    new_img = variation.process(img)
-    dest_path = variation.replace_extension('dest.jpg')
-    variation.save(new_img, dest_path)
+img = Image.open('source.jpg')
+img = prepare_image(img, draft_size=variation.get_output_size(img.size))
+new_img = variation.process(img)
+dest_path = variation.replace_extension('dest.jpg')
+variation.save(new_img, dest_path)
 ```
 
 ## Options
