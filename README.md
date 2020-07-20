@@ -1,7 +1,8 @@
 # variations
 A simple interface that allows processing of images.
 
-![](https://travis-ci.org/dldevinc/variations.svg?branch=master)
+[![PyPI](https://img.shields.io/pypi/v/variations.svg)](https://pypi.org/project/variations/)
+[![Build Status](https://travis-ci.org/dldevinc/variations.svg?branch=master)](https://travis-ci.org/dldevinc/variations)
 
 ## Compatibility
 * `python` >= 3.5
