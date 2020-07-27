@@ -354,6 +354,9 @@ class Variation:
         else:
             autoconvert = opts.pop('autoconvert', True)
 
+        if isinstance(outfile, Path):
+            outfile = str(outfile)
+
         save_image(
-            img, str(outfile), format=format, options=opts, autoconvert=autoconvert
+            img, outfile, format=format, options=opts, autoconvert=autoconvert
         )
