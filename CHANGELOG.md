@@ -1,5 +1,8 @@
 # Change Log
 
+## [0.1.1](https://github.com/dldevinc/variations/tree/v0.1.1) - 2020-07-27
+* Fixed `save()` method with `io` object as output
+
 ## [0.1.0](https://github.com/dldevinc/variations/tree/v0.1.0) - 2020-07-16
 * Updated development environment
 * Added `pathlib` support
