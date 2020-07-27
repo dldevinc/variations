@@ -1,10 +1,13 @@
 import io
-from pathlib import Path
-
 import pytest
+from pathlib import Path
+from PIL import Image
 from pilkit import processors
+
 from variations import processors
 from variations.variation import Variation
+
+from . import helper
 
 
 class TestVariation:
@@ -202,3 +205,43 @@ class TestVariation:
 
         v = Variation([100, 200], anchor=[0.1, 0.75])
         assert v.anchor == (0.1, 0.75)
+
+    def test_save_string(self):
+        img = Image.new("RGB", (640, 480), color='red')
+
+        v = Variation([100, 200])
+
+        output_path = helper.OUTPUT_PATH / 'save/str.jpg'
+        if not output_path.parent.is_dir():
+            output_path.parent.mkdir(parents=True)
+
+        v.save(img, str(output_path))
+
+    def test_save_path(self):
+        img = Image.new("RGB", (640, 480), color='red')
+
+        v = Variation([100, 200])
+
+        output_path = helper.OUTPUT_PATH / 'save/path.jpg'
+        if not output_path.parent.is_dir():
+            output_path.parent.mkdir(parents=True)
+
+        v.save(img, output_path)
+
+    def test_save_io(self):
+        img = Image.new("RGB", (640, 480), color='red')
+
+        v = Variation([100, 200])
+
+        output_path = helper.OUTPUT_PATH / 'save/io.jpg'
+        if not output_path.parent.is_dir():
+            output_path.parent.mkdir(parents=True)
+
+        buffer = io.BytesIO()
+        v.save(img, buffer)
+
+        buffer.seek(0)
+        with open(output_path, 'wb+') as fp:
+            for chunk in buffer:
+                fp.write(chunk)
+        buffer.close()
