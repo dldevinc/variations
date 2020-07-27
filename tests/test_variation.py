@@ -241,7 +241,7 @@ class TestVariation:
         v.save(img, buffer)
 
         buffer.seek(0)
-        with open(output_path, 'wb+') as fp:
+        with open(str(output_path), 'wb+') as fp:
             for chunk in buffer:
                 fp.write(chunk)
         buffer.close()
