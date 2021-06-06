@@ -3,6 +3,7 @@
 ## [0.2.0](https://github.com/dldevinc/variations/tree/v0.2.0) - 2021-06-06
 * Dropped Python 3.5
 * Support Python 3.9
+* Test against `Pillow` 8.2.0
 
 ## [0.1.2](https://github.com/dldevinc/variations/tree/v0.1.2) - 2020-10-20
 * Remove Pillow 7.2.0 restriction
