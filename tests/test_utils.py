@@ -45,6 +45,8 @@ def test_replace_extension():
 @pytest.mark.parametrize('format', ['png', 'jpeg', 'tiff', 'gif', 'webp'])
 @pytest.mark.parametrize('source_folder', ['png', 'jpg', 'gif', 'webp'])
 def test_opaque_background(source_folder, format):
+    results = []
+
     input_folder = helper.INPUT_PATH / source_folder
     for input_path in sorted(input_folder.iterdir()):
         original = Image.open(input_path)
@@ -60,4 +62,8 @@ def test_opaque_background(source_folder, format):
 
         target_path = helper.TARGET_PATH / relative_path
         target_path = utils.replace_extension(target_path, format)
+
+        results.append((output_path, target_path))
+
+    for output_path, target_path in results:
         assert helper.image_diff(output_path, target_path) is None

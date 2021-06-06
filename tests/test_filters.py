@@ -94,7 +94,7 @@ class TestCustomFilter:
             format='webp',
             webp=dict(quality=0,),
             preprocessors=[processors.MakeOpaque('#FFFF00')],
-            postprocessors=[processors.StackBlur(8)],
+            postprocessors=[processors.StackBlur(10)],
         )
 
         input_path = str(helper.INPUT_PATH / input_file)

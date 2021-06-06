@@ -1,9 +1,9 @@
 language: python
 python:
+- 3.9
 - 3.8
 - 3.7
 - 3.6
-- 3.5
 
 before_install:
 - pip install twine
@@ -11,7 +11,7 @@ before_install:
 - sudo apt-get -y install libdlib-dev
 
 install:
-- pip install -r ./requirements_dev.txt
+- pip install -r ./requirements.txt
 
 branches:
   only:

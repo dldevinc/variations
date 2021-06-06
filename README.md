@@ -5,7 +5,7 @@ A simple interface that allows processing of images.
 [![Build Status](https://travis-ci.org/dldevinc/variations.svg?branch=master)](https://travis-ci.org/dldevinc/variations)
 
 ## Compatibility
-* `python` >= 3.5
+* `python` >= 3.6
 
 ## Installation
 1. Run `pip install variations`
@@ -92,6 +92,6 @@ in a virtualenv and set up for development:
 ```shell script
 virtualenv .venv
 source .venv/bin/activate
-pip install -r ./requirements_dev.txt
+pip install -r ./requirements.txt
 pre-commit install
 ```

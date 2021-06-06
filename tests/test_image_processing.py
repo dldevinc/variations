@@ -70,6 +70,7 @@ class TestVariationProcess:
     input_files = ['jpg', 'png', 'gif', 'webp']
 
     def _iterate_sizes(self, img: Image, input_file: Path, clip: bool, upscale: bool):
+        results = []
         source_size = img.size
         filename, ext = os.path.splitext(input_file.name)
 
@@ -99,8 +100,11 @@ class TestVariationProcess:
 
             variation.save(new_img, output_path)
 
-            # check output
             target_path = helper.TARGET_PATH / relative_path
+
+            results.append((output_path, target_path))
+
+        for output_path, target_path in results:
             assert helper.image_diff(output_path, target_path) is None
 
     @pytest.mark.parametrize('upscale', [True, False])
@@ -115,6 +119,7 @@ class TestVariationProcess:
 
 class TestOverlayedVariationProcess(TestVariationProcess):
     def _iterate_sizes(self, img: Image, input_file: Path, clip: bool, upscale: bool):
+        results = []
         source_size = img.size
         filename, ext = os.path.splitext(input_file.name)
 
@@ -147,6 +152,9 @@ class TestOverlayedVariationProcess(TestVariationProcess):
 
             variation.save(new_img, output_path)
 
-            # check output
             target_path = helper.TARGET_PATH / relative_path
+
+            results.append((output_path, target_path))
+
+        for output_path, target_path in results:
             assert helper.image_diff(output_path, target_path) is None
