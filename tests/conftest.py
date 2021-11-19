@@ -1,21 +1,6 @@
 from pathlib import Path
 
-import pytest
-
 from . import helper
-
-
-@pytest.fixture
-def input_files(request):
-    resolved_path = (Path(helper.INPUT_PATH) / request.param).resolve()
-    if resolved_path.is_dir():
-        sorted_files = sorted(file for file in resolved_path.iterdir() if file.is_file())
-        return [
-            file.relative_to(helper.INPUT_PATH)
-            for file in sorted_files
-        ]
-    else:
-        raise ValueError("invalid internal test config")
 
 
 def pytest_generate_tests(metafunc):
