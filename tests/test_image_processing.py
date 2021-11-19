@@ -67,7 +67,7 @@ SIZE_MAP = {
 
 
 class TestVariationProcess:
-    input_files = ['jpg', 'png', 'gif', 'webp']
+    input_files = ["jpg", "png", "gif", "webp"]
 
     def _iterate_sizes(self, img: Image, input_file: Path, clip: bool, upscale: bool):
         results = []
@@ -77,12 +77,12 @@ class TestVariationProcess:
         for size, canvas in SIZE_MAP[clip][upscale].items():
             filename_parts = [
                 filename,
-                'x'.join(map(str, size)),
-                'noclip' if not clip else '',
-                'upscale' if upscale else '',
+                "x".join(map(str, size)),
+                "noclip" if not clip else "",
+                "upscale" if upscale else "",
             ]
-            output_filename = ','.join(filter(bool, filename_parts)) + ext
-            relative_path = input_file.parent / 'plain' / output_filename
+            output_filename = ",".join(filter(bool, filename_parts)) + ext
+            relative_path = input_file.parent / "plain" / output_filename
 
             variation = Variation(
                 size=size,
@@ -107,11 +107,11 @@ class TestVariationProcess:
         for output_path, target_path in results:
             assert helper.image_diff(output_path, target_path) is None
 
-    @pytest.mark.parametrize('upscale', [True, False])
-    @pytest.mark.parametrize('clip', [True, False])
+    @pytest.mark.parametrize("upscale", [True, False])
+    @pytest.mark.parametrize("clip", [True, False])
     def test_file(self, input_file, clip, upscale):
         input_file_path = str(helper.INPUT_PATH / input_file)
-        with open(input_file_path, 'rb') as fp:
+        with open(input_file_path, "rb") as fp:
             img = Image.open(fp)
             img = prepare_image(img)
             self._iterate_sizes(img, input_file, clip, upscale)
@@ -126,19 +126,19 @@ class TestOverlayedVariationProcess(TestVariationProcess):
         for size, canvas in SIZE_MAP[clip][upscale].items():
             filename_parts = [
                 filename,
-                'x'.join(map(str, size)),
-                'noclip' if not clip else '',
-                'upscale' if upscale else '',
+                "x".join(map(str, size)),
+                "noclip" if not clip else "",
+                "upscale" if upscale else "",
             ]
-            output_filename = ','.join(filter(bool, filename_parts)) + ext
-            relative_path = input_file.parent / 'overlay' / output_filename
+            output_filename = ",".join(filter(bool, filename_parts)) + ext
+            relative_path = input_file.parent / "overlay" / output_filename
 
             variation = Variation(
                 size=size,
                 clip=clip,
                 upscale=upscale,
                 postprocessors=[
-                    processors.ColorOverlay('#0000FF', 0.10)
+                    processors.ColorOverlay("#0000FF", 0.10)
                 ]
             )
             assert variation.get_output_size(source_size) == canvas

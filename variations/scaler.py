@@ -7,12 +7,12 @@ class Scaler:
     """
 
     __slots__ = (
-        '_width',
-        '_height',
-        '_width_orig',
-        '_height_orig',
-        '_upscale',
-        '_ratio',
+        "_width",
+        "_height",
+        "_width_orig",
+        "_height_orig",
+        "_upscale",
+        "_ratio",
     )
 
     def __init__(self, width: int, height: int, upscale: bool = False):
@@ -22,10 +22,10 @@ class Scaler:
         self._upscale = bool(upscale)
 
     def __str__(self):
-        return '{}x{}'.format(self.width, self.height)
+        return "{}x{}".format(self.width, self.height)
 
     def __repr__(self):
-        return '{}({}, {})'.format(self.__class__.__name__, self.width, self.height)
+        return "{}({}, {})".format(self.__class__.__name__, self.width, self.height)
 
     @property
     def width(self):

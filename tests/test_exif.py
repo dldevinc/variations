@@ -6,12 +6,12 @@ from . import helper
 
 
 class TestExifOrientation:
-    input_files = ['exif']
+    input_files = ["exif"]
 
     def test_exif(self, input_file):
         variation = Variation(size=(1024, 768), clip=False, upscale=True)
         input_file_path = str(helper.INPUT_PATH / input_file)
-        with open(input_file_path, 'rb') as fp:
+        with open(input_file_path, "rb") as fp:
             img = Image.open(fp)
             img = prepare_image(img)
             new_img = variation.process(img)

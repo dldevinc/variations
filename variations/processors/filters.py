@@ -15,24 +15,24 @@ except ImportError:
     StackBlur = None
 
 __all__ = [
-    'Grayscale',
-    'Posterize',
-    'Solarize',
-    'Blur',
-    'Sharpen',
-    'Smooth',
-    'EdgeEnhance',
-    'UnsharpMask',
-    'BoxBlur',
-    'GaussianBlur',
-    'STACK_BLUR_SUPPORT',
-    'StackBlur',
+    "Grayscale",
+    "Posterize",
+    "Solarize",
+    "Blur",
+    "Sharpen",
+    "Smooth",
+    "EdgeEnhance",
+    "UnsharpMask",
+    "BoxBlur",
+    "GaussianBlur",
+    "STACK_BLUR_SUPPORT",
+    "StackBlur",
 ]
 
 
 class Grayscale:
     def process(self, img):
-        return img.convert('LA').convert('RGBA')
+        return img.convert("LA").convert("RGBA")
 
 
 class Posterize:

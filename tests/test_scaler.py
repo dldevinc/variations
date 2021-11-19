@@ -6,11 +6,11 @@ from variations.scaler import Scaler
 class TestScaler:
     def test_scaler_str(self):
         s = Scaler(300, 600)
-        assert str(s) == '300x600'
+        assert str(s) == "300x600"
 
     def test_scaler_repr(self):
         s = Scaler(300, 600)
-        assert repr(s) == 'Scaler(300, 600)'
+        assert repr(s) == "Scaler(300, 600)"
 
     def test_scaler_ratio(self):
         assert Scaler(300, 600).ratio == 0.5

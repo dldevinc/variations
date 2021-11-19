@@ -12,15 +12,15 @@ from pilkit.processors.resize import (
 )
 
 __all__ = [
-    'Resize',
-    'ResizeToCover',
-    'ResizeToFill',
-    'SmartResize',
-    'ResizeCanvas',
-    'AddBorder',
-    'ResizeToFit',
-    'Thumbnail',
-    'FaceDetectionResizeToFill',
+    "Resize",
+    "ResizeToCover",
+    "ResizeToFill",
+    "SmartResize",
+    "ResizeCanvas",
+    "AddBorder",
+    "ResizeToFit",
+    "Thumbnail",
+    "FaceDetectionResizeToFill",
 ]
 
 
@@ -45,8 +45,8 @@ class FaceDetectionResizeToFill(ResizeToFill):
             )
             return
 
-        if img.mode not in ('RGB', 'L'):
-            clone = img.convert('RGB')
+        if img.mode not in ("RGB", "L"):
+            clone = img.convert("RGB")
             image_data = numpy.array(clone)
         else:
             image_data = numpy.array(img)

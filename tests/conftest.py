@@ -4,9 +4,8 @@ from . import helper
 
 
 def pytest_generate_tests(metafunc):
-    if hasattr(metafunc.cls, 'input_files'):
+    if hasattr(metafunc.cls, "input_files"):
         if "input_file" in metafunc.fixturenames:
-            idlist = []
             argvalues = []
             for dirname in metafunc.cls.input_files:
                 resolved_path = (Path(helper.INPUT_PATH) / dirname).resolve()
@@ -18,7 +17,7 @@ def pytest_generate_tests(metafunc):
                     )
 
             metafunc.parametrize(
-                'input_file',
+                "input_file",
                 argvalues,
                 ids=map(str, argvalues)
             )
