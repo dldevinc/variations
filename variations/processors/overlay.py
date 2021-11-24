@@ -1,6 +1,6 @@
 from pilkit.lib import Image, ImageColor
 
-__all__ = ['ColorOverlay']
+__all__ = ["ColorOverlay"]
 
 
 class ColorOverlay:
@@ -21,6 +21,6 @@ class ColorOverlay:
             color += (int(self.overlay_opacity * 255),)
 
         original = img
-        overlay = Image.new('RGBA', original.size, color)
+        overlay = Image.new("RGBA", original.size, color)
         img = Image.alpha_composite(original, overlay)
         return img

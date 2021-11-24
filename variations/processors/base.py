@@ -8,12 +8,12 @@ from pilkit.processors.base import (
 )
 
 __all__ = [
-    'ProcessorPipeline',
-    'Adjust',
-    'Reflection',
-    'Transpose',
-    'Anchor',
-    'MakeOpaque',
+    "ProcessorPipeline",
+    "Adjust",
+    "Reflection",
+    "Transpose",
+    "Anchor",
+    "MakeOpaque",
 ]
 
 
@@ -30,10 +30,10 @@ class MakeOpaque:
         self.background_color = background_color[:3]
 
     def process(self, img):
-        new_img = Image.new('RGB', img.size, self.background_color)
-        if img.mode in ('P', 'LA'):
-            img = img.convert('RGBA')
-        if img.mode in ('1', 'L', 'RGBA'):
+        new_img = Image.new("RGB", img.size, self.background_color)
+        if img.mode in ("P", "LA"):
+            img = img.convert("RGBA")
+        if img.mode in ("1", "L", "RGBA"):
             new_img.paste(img, img)
         else:
             new_img.paste(img)

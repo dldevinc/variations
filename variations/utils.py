@@ -18,7 +18,7 @@ def guess_format(fp: FilePtr) -> Optional[str]:
         filename = str(fp)
     elif isinstance(fp, str):
         filename = fp
-    elif hasattr(fp, 'name'):
+    elif hasattr(fp, "name"):
         filename = fp.name
     else:
         return None
@@ -49,7 +49,7 @@ def replace_extension(path: PathLike, format: str) -> str:
         return path
 
     root, original_ext = posixpath.splitext(path)
-    return ''.join((root, preferred_extension))
+    return "".join((root, preferred_extension))
 
 
 def apply_exif_orientation(img: Image, info: Dict[str, Any] = None) -> Image:
@@ -59,7 +59,7 @@ def apply_exif_orientation(img: Image, info: Dict[str, Any] = None) -> Image:
     from PIL.JpegImagePlugin import _getexif
 
     if info:
-        obj = namedtuple('FakeImage', ['info'])(info)
+        obj = namedtuple("FakeImage", ["info"])(info)
     else:
         obj = img
 
@@ -77,12 +77,12 @@ def apply_exif_orientation(img: Image, info: Dict[str, Any] = None) -> Image:
     return img
 
 
-def make_opaque(img: Image, color: Color = '#FFFFFF') -> Image:
+def make_opaque(img: Image, color: Color = "#FFFFFF") -> Image:
     """
     Замена RGB-составляющей полностью прозрачных пикселей на указанный цвет.
     """
-    img = img.convert('RGBA')
-    overlay = Image.new('RGBA', img.size, color)
+    img = img.convert("RGBA")
+    overlay = Image.new("RGBA", img.size, color)
     return Image.alpha_composite(overlay, img)
 
 
@@ -97,9 +97,9 @@ def prepare_image(
        артефактов при ресайзе
     """
     format = img.format
-    if draft_size is not None and format == 'JPEG':
+    if draft_size is not None and format == "JPEG":
         img.draft(img.mode, draft_size)
-    if format in {'JPEG', 'TIFF'}:
+    if format in {"JPEG", "TIFF"}:
         img = apply_exif_orientation(img)
     if background_color is not None:
         img = make_opaque(img, background_color)

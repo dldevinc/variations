@@ -6,7 +6,7 @@ from . import helper
 
 
 class TestFaceDetection:
-    input_files = ['faces']
+    input_files = ["faces"]
 
     def test_face_detection(self, input_file):
         input_path = helper.INPUT_PATH / input_file

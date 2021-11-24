@@ -12,7 +12,7 @@ from .typing import FilePtr, PathLike, Size
 
 
 class Variation:
-    logger = logging.getLogger('variations')
+    logger = logging.getLogger("variations")
 
     def __init__(
         self,
@@ -75,7 +75,7 @@ class Variation:
 
     @size.setter
     def size(self, value: Size):
-        error_msg = '"size" argument must be a sequence of two non-negative integers'
+        error_msg = "'size' argument must be a sequence of two non-negative integers"
 
         # filter out some wrong types
         if isinstance(value, (dict, set, str)):
@@ -108,7 +108,7 @@ class Variation:
 
     @max_width.setter
     def max_width(self, value):
-        error_msg = '"max_width" argument must be a non-negative integer'
+        error_msg = "'max_width' argument must be a non-negative integer"
         try:
             value = int(value)
         except (TypeError, ValueError):
@@ -118,10 +118,10 @@ class Variation:
             raise ValueError(error_msg)
 
         if value and self.clip:
-            self.logger.warning('"max_width" makes sense only when "clip" is False')
+            self.logger.warning("'max_width' makes sense only when 'clip' is False")
 
         if value and self.width:
-            self.logger.warning('"max_width" makes sense only when "width" is 0')
+            self.logger.warning("'max_width' makes sense only when 'width' is 0")
 
         self._max_width = value
 
@@ -131,7 +131,7 @@ class Variation:
 
     @max_height.setter
     def max_height(self, value):
-        error_msg = '"max_height" argument must be a non-negative integer'
+        error_msg = "'max_height' argument must be a non-negative integer"
         try:
             value = int(value)
         except (TypeError, ValueError):
@@ -141,10 +141,10 @@ class Variation:
             raise ValueError(error_msg)
 
         if value and self.clip:
-            self.logger.warning('"max_height" makes sense only when "clip" is False')
+            self.logger.warning("'max_height' makes sense only when 'clip' is False")
 
         if value and self.height:
-            self.logger.warning('`max_height` makes sense only when "height" is 0')
+            self.logger.warning("`max_height` makes sense only when 'height' is 0")
 
         self._max_height = value
 
@@ -168,7 +168,7 @@ class Variation:
             value = processors.Anchor.get_tuple(value.lower())
 
         error_msg = (
-            '"anchor" argument must be a sequence of two float numbers between 0 and 1'
+            "'anchor' argument must be a sequence of two float numbers between 0 and 1"
         )
         if not isinstance(value, (tuple, list)):
             raise TypeError(error_msg)
@@ -191,11 +191,11 @@ class Variation:
     @format.setter
     def format(self, value):
         if not isinstance(value, str):
-            raise TypeError('"format" must be a string')
+            raise TypeError("'format' must be a string")
 
         value = value.upper()
         if value != conf.AUTO_FORMAT and value not in Image.EXTENSION.values():
-            raise ValueError('unsupported format: %s' % value)
+            raise ValueError("unsupported format: %s" % value)
         self._format = value
 
     @property
@@ -207,8 +207,8 @@ class Variation:
         if value is None:
             value = []
         for proc in value:
-            if not hasattr(proc, 'process'):
-                raise TypeError('one of preprocessors has no method "process"')
+            if not hasattr(proc, "process"):
+                raise TypeError("one of preprocessors has no method 'process'")
         self._preprocessors = list(value)
 
     @property
@@ -220,8 +220,8 @@ class Variation:
         if value is None:
             value = []
         for proc in value:
-            if not hasattr(proc, 'process'):
-                raise TypeError('one of postprocessors has no method "process"')
+            if not hasattr(proc, "process"):
+                raise TypeError("one of postprocessors has no method 'process'")
         self._postprocessors = list(value)
 
     @property
@@ -325,7 +325,7 @@ class Variation:
     def _detect_format(self, outfile: FilePtr) -> str:
         if isinstance(outfile, (str, Path)):
             return self.output_format(outfile)
-        elif hasattr(outfile, 'name'):
+        elif hasattr(outfile, "name"):
             return self.output_format(outfile.name)
         elif self.format and self.format != conf.AUTO_FORMAT:
             return self.format
@@ -337,7 +337,7 @@ class Variation:
         Сохранение картинки в файл.
         """
         opts = options.copy()
-        format = opts.pop('format', None)
+        format = opts.pop("format", None)
         if not format:
             format = self._detect_format(outfile)
         format = format.lower()
@@ -349,10 +349,10 @@ class Variation:
             opts.setdefault(k, v)
 
         # включаем autoconvert по умолчанию для всех форматов, кроме WebP
-        if format == 'webp':
-            autoconvert = opts.pop('autoconvert', False)
+        if format == "webp":
+            autoconvert = opts.pop("autoconvert", False)
         else:
-            autoconvert = opts.pop('autoconvert', True)
+            autoconvert = opts.pop("autoconvert", True)
 
         if isinstance(outfile, Path):
             outfile = str(outfile)
