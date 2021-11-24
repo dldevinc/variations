@@ -1,5 +1,8 @@
 # Change Log
 
+## [0.2.1](https://github.com/dldevinc/variations/tree/v0.2.1) - 2021-11-24
+* Update tests
+
 ## [0.2.0](https://github.com/dldevinc/variations/tree/v0.2.0) - 2021-06-06
 * Dropped Python 3.5
 * Support Python 3.9
