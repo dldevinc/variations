@@ -101,14 +101,4 @@
     * P.S. "основным действием вариации" является ресайз и/или кадрирование,
     в зависимости от параметров size, crop, upscale и размера исходного изображения.
 """
-
-# загрузка всех плагинов PIL
-try:
-    from PIL import Image
-
-    Image.init()
-except ImportError:
-    # prevent error when calling `pip install -e .`
-    pass
-
 __version__ = "0.2.1"
