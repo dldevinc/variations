@@ -34,9 +34,10 @@ def test_replace_extension():
     assert utils.replace_extension("image.jpg", "jpg") == "image.jpg"
     assert utils.replace_extension("image.jpg", "jpeg") == "image.jpg"
     assert utils.replace_extension("image.jpg", "PNG") == "image.png"
-    assert utils.replace_extension("image.jpg", "JPEG2000") == "image.j2k"
+    assert utils.replace_extension("image.jpg", "JPEG2000") == "image.jp2"
     assert utils.replace_extension("image.jpg", "webp") == "image.webp"
     assert utils.replace_extension("image.jpg", "mp3") == "image.jpg"
+    assert utils.replace_extension("image.jpg", "tiff") == "image.tif"
 
     assert utils.replace_extension(Path("image.jpg"), "jpg") == "image.jpg"
     assert utils.replace_extension(Path("image.jpg"), "PNG") == "image.png"

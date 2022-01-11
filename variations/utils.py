@@ -3,11 +3,13 @@ from collections import namedtuple
 from pathlib import Path
 from typing import Any, Dict, Optional
 
+from pilkit.exceptions import UnknownFormat
 from pilkit.lib import Image
+from pilkit.utils import format_to_extension
 
 from . import conf
 from .processors import Transpose
-from .typing import FilePtr, PathLike, Color, Size
+from .typing import Color, FilePtr, PathLike, Size
 
 
 def guess_format(fp: FilePtr) -> Optional[str]:
@@ -30,13 +32,6 @@ def guess_format(fp: FilePtr) -> Optional[str]:
         return None
 
 
-def get_preferred_extension(format: str) -> str:
-    """
-    Возвращает наиболее подходящее расширение для формата format.
-    """
-    return conf.PREFERRED_EXTENSIONS[format.upper()]
-
-
 def replace_extension(path: PathLike, format: str) -> str:
     """
     Замена расширения файла в пути path на наиболее подходящее для формата format.
@@ -44,12 +39,12 @@ def replace_extension(path: PathLike, format: str) -> str:
     path = str(path)
 
     try:
-        preferred_extension = get_preferred_extension(format)
-    except KeyError:
+        suggested_extension = format_to_extension(format)
+    except UnknownFormat:
         return path
 
     root, original_ext = posixpath.splitext(path)
-    return "".join((root, preferred_extension))
+    return "".join((root, suggested_extension))
 
 
 def apply_exif_orientation(img: Image, info: Dict[str, Any] = None) -> Image:
