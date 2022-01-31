@@ -7,7 +7,6 @@ from pilkit.exceptions import UnknownFormat
 from pilkit.lib import Image
 from pilkit.utils import format_to_extension
 
-from . import conf
 from .processors import Transpose
 from .typing import Color, FilePtr, PathLike, Size
 

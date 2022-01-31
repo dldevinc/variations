@@ -3,8 +3,9 @@ import logging
 from pathlib import Path
 from typing import Any, Dict, Iterable, cast
 
+from pilkit.exceptions import UnknownFormat
 from pilkit.lib import Image
-from pilkit.utils import save_image
+from pilkit.utils import format_to_extension, save_image
 
 from . import conf, processors, utils
 from .scaler import Scaler
@@ -194,8 +195,12 @@ class Variation:
             raise TypeError("'format' must be a string")
 
         value = value.upper()
-        if value != conf.AUTO_FORMAT and value not in Image.EXTENSION.values():
-            raise ValueError("unsupported format: %s" % value)
+        if value != conf.AUTO_FORMAT:
+            try:
+                format_to_extension(value)
+            except UnknownFormat:
+                raise ValueError("unsupported format: %s" % value)
+
         self._format = value
 
     @property
