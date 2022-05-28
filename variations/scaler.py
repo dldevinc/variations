@@ -1,4 +1,5 @@
 from fractions import Fraction
+from typing import Union
 
 
 class Scaler:
@@ -16,8 +17,8 @@ class Scaler:
     )
 
     def __init__(self, width: int, height: int, upscale: bool = False):
-        self._width = self._width_orig = int(width)
-        self._height = self._height_orig = int(height)
+        self._width = self._width_orig = width  # type: Union[int, float, Fraction]
+        self._height = self._height_orig = height  # type: Union[int, float, Fraction]
         self._ratio = Fraction(width, height)
         self._upscale = bool(upscale)
 
@@ -28,18 +29,21 @@ class Scaler:
         return "{}({}, {})".format(self.__class__.__name__, self.width, self.height)
 
     @property
-    def width(self):
+    def width(self) -> int:
         return round(self._width)
 
     @property
-    def height(self):
+    def height(self) -> int:
         return round(self._height)
 
     @property
-    def ratio(self):
+    def ratio(self) -> Fraction:
         return self._ratio
 
     def set_width(self, value):
+        """
+        Пропорциональное изменение ширины.
+        """
         new_width = value
         if new_width <= self._width_orig or not self._upscale:
             new_width = min(new_width, self._width_orig)
@@ -49,6 +53,9 @@ class Scaler:
         return self
 
     def set_height(self, value):
+        """
+        Пропорциональное изменение высоты.
+        """
         new_height = value
         if new_height <= self._height_orig or not self._upscale:
             new_height = min(new_height, self._height_orig)
