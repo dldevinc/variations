@@ -22,7 +22,7 @@ class TestFilters:
             relative_path = Path("filters") / dirname / input_file.name
             output_path = helper.OUTPUT_PATH / relative_path
             if not output_path.parent.is_dir():
-                output_path.parent.mkdir(parents=True)
+                output_path.parent.mkdir(parents=True, exist_ok=True)
 
             variation.save(new_img, output_path)
 
@@ -106,7 +106,7 @@ class TestCustomFilter:
             relative_path = Path("filters/custom") / input_file.name
             output_path = helper.OUTPUT_PATH / relative_path
             if not output_path.parent.is_dir():
-                output_path.parent.mkdir(parents=True)
+                output_path.parent.mkdir(parents=True, exist_ok=True)
 
             output_path = variation.replace_extension(output_path)
             variation.save(new_img, output_path)

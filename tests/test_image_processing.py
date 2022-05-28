@@ -93,7 +93,7 @@ class TestVariationProcess:
 
             output_path = helper.OUTPUT_PATH / relative_path
             if not output_path.parent.is_dir():
-                output_path.parent.mkdir(parents=True)
+                output_path.parent.mkdir(parents=True, exist_ok=True)
 
             new_img = variation.process(img)
             assert new_img.size == canvas
@@ -145,7 +145,7 @@ class TestOverlayedVariationProcess(TestVariationProcess):
 
             output_path = helper.OUTPUT_PATH / relative_path
             if not output_path.parent.is_dir():
-                output_path.parent.mkdir(parents=True)
+                output_path.parent.mkdir(parents=True, exist_ok=True)
 
             new_img = variation.process(img)
             assert new_img.size == canvas

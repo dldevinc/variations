@@ -18,7 +18,7 @@ class TestFaceDetection:
 
         output_path = helper.OUTPUT_PATH / input_file
         if not output_path.parent.is_dir():
-            output_path.parent.mkdir(parents=True)
+            output_path.parent.mkdir(parents=True, exist_ok=True)
 
         variation.save(new_img, output_path)
 
