@@ -4,7 +4,7 @@ from typing import Union
 
 class Scaler:
     """
-    Вычисляет размеры прямоугольника, сохраняя пропорции
+    Вычисление новых размеров прямоугольника с сохранением пропорций.
     """
 
     __slots__ = (
@@ -16,11 +16,15 @@ class Scaler:
         "_ratio",
     )
 
-    def __init__(self, width: int, height: int, upscale: bool = False):
-        self._width = self._width_orig = width  # type: Union[int, float, Fraction]
-        self._height = self._height_orig = height  # type: Union[int, float, Fraction]
-        self._ratio = Fraction(width, height)
+    def __init__(self, width: Union[int, float], height: Union[int, float], upscale: bool = False):
+        self._width = self._width_orig = width
+        self._height = self._height_orig = height
         self._upscale = bool(upscale)
+
+        if isinstance(width, int) and isinstance(height, int):
+            self._ratio = Fraction(width, height)
+        else:
+            self._ratio = Fraction(Fraction.from_float(width), Fraction.from_float(height))
 
     def __str__(self):
         return "{}x{}".format(self.width, self.height)

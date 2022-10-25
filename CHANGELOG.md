@@ -1,5 +1,11 @@
 # Change Log
 
+## [0.3.2](https://github.com/dldevinc/variations/tree/v0.3.2) - 2022-10-25
+
+### Features
+
+-   `Scaler` class now supports `float` values for image dimensions.
+
 ## [0.3.1](https://github.com/dldevinc/variations/tree/v0.3.1) - 2022-01-31
 
 -   Fixed missing image drivers
