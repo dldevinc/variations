@@ -56,7 +56,7 @@ def test_opaque_background(source_folder, format):
         relative_path = Path("opaque") / source_folder / format / input_path.relative_to(input_folder)
         output_path = helper.OUTPUT_PATH / relative_path
         if not output_path.parent.is_dir():
-            output_path.parent.mkdir(parents=True)
+            output_path.parent.mkdir(parents=True, exist_ok=True)
 
         output_path = utils.replace_extension(output_path, format)
         save_image(img, output_path, format=format)

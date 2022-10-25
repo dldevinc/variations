@@ -37,8 +37,8 @@ class FaceDetectionResizeToFill(ResizeToFill):
     @staticmethod
     def _detect_faces(img):
         try:
-            import numpy
             import face_recognition
+            import numpy
         except ImportError:
             logging.warning(
                 "Cannot use face detection because 'face_recognition' is not installed."

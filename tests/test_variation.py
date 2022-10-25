@@ -213,7 +213,7 @@ class TestVariation:
 
         output_path = helper.OUTPUT_PATH / "save/str.jpg"
         if not output_path.parent.is_dir():
-            output_path.parent.mkdir(parents=True)
+            output_path.parent.mkdir(parents=True, exist_ok=True)
 
         v.save(img, str(output_path))
 
@@ -224,7 +224,7 @@ class TestVariation:
 
         output_path = helper.OUTPUT_PATH / "save/path.jpg"
         if not output_path.parent.is_dir():
-            output_path.parent.mkdir(parents=True)
+            output_path.parent.mkdir(parents=True, exist_ok=True)
 
         v.save(img, output_path)
 
@@ -235,7 +235,7 @@ class TestVariation:
 
         output_path = helper.OUTPUT_PATH / "save/io.jpg"
         if not output_path.parent.is_dir():
-            output_path.parent.mkdir(parents=True)
+            output_path.parent.mkdir(parents=True, exist_ok=True)
 
         buffer = io.BytesIO()
         v.save(img, buffer)
