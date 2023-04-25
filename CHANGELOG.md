@@ -1,5 +1,11 @@
 # Change Log
 
+## [0.3.3](https://github.com/dldevinc/variations/tree/v0.3.3) - 2024-04-25
+
+### Features
+
+-   Add support for Python 3.11.
+
 ## [0.3.2](https://github.com/dldevinc/variations/tree/v0.3.2) - 2022-10-25
 
 ### Features
