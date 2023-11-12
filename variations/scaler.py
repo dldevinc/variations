@@ -10,15 +10,15 @@ class Scaler:
     __slots__ = (
         "_width",
         "_height",
-        "_width_orig",
-        "_height_orig",
+        "_original_width",
+        "_original_height",
         "_upscale",
         "_ratio",
     )
 
     def __init__(self, width: Union[int, float], height: Union[int, float], upscale: bool = False):
-        self._width = self._width_orig = width
-        self._height = self._height_orig = height
+        self._width = self._original_width = width
+        self._height = self._original_height = height
         self._upscale = bool(upscale)
 
         if isinstance(width, int) and isinstance(height, int):
@@ -49,21 +49,19 @@ class Scaler:
         Пропорциональное изменение ширины.
         """
         new_width = value
-        if new_width <= self._width_orig or not self._upscale:
-            new_width = min(new_width, self._width_orig)
+        if new_width <= self._original_width or not self._upscale:
+            new_width = min(new_width, self._original_width)
 
         self._width = new_width
         self._height = self._width / self._ratio
-        return self
 
     def set_height(self, value):
         """
         Пропорциональное изменение высоты.
         """
         new_height = value
-        if new_height <= self._height_orig or not self._upscale:
-            new_height = min(new_height, self._height_orig)
+        if new_height <= self._original_height or not self._upscale:
+            new_height = min(new_height, self._original_height)
 
         self._height = new_height
         self._width = self._height * self._ratio
-        return self
