@@ -1,4 +1,4 @@
-import posixpath
+import os
 from collections import namedtuple
 from pathlib import Path
 from typing import Any, Dict, Optional
@@ -8,30 +8,28 @@ from pilkit.lib import Image
 from pilkit.utils import format_to_extension
 
 from .processors import Transpose
-from .typing import Color, FilePtr, PathLike, Size
+from .typing import Color, FilePath, FilePointer, Size
 
 
-def guess_format(fp: FilePtr) -> Optional[str]:
+def guess_format(fp: FilePointer) -> Optional[str]:
     """
     Определение формата изображение по расширению файла.
     """
-    if isinstance(fp, Path):
+    if isinstance(fp, (str, Path)):
         filename = str(fp)
-    elif isinstance(fp, str):
-        filename = fp
     elif hasattr(fp, "name"):
         filename = fp.name
     else:
         return None
 
-    ext = posixpath.splitext(filename)[1].lower()
+    ext = os.path.splitext(filename)[1].lower()
     try:
         return Image.EXTENSION[ext]
     except KeyError:
         return None
 
 
-def replace_extension(path: PathLike, format: str) -> str:
+def replace_extension(path: FilePath, format: str) -> str:
     """
     Замена расширения файла в пути path на наиболее подходящее для формата format.
     """
@@ -42,7 +40,7 @@ def replace_extension(path: PathLike, format: str) -> str:
     except UnknownFormat:
         return path
 
-    root, original_ext = posixpath.splitext(path)
+    root, original_ext = os.path.splitext(path)
     return "".join((root, suggested_extension))
 
 

@@ -9,7 +9,7 @@ from pilkit.utils import format_to_extension, save_image
 
 from . import conf, processors, utils
 from .scaler import Scaler
-from .typing import FilePtr, PathLike, Size
+from .typing import FilePath, FilePointer, Size
 
 
 class Variation:
@@ -311,7 +311,7 @@ class Variation:
         """
         return self.get_processor(img.size).process(img)
 
-    def output_format(self, path: PathLike) -> str:
+    def output_format(self, path: FilePath) -> str:
         """
         Определение итогового формата изображения.
         """
@@ -320,14 +320,14 @@ class Variation:
             format = utils.guess_format(path) or conf.FALLBACK_FORMAT
         return format
 
-    def replace_extension(self, path: PathLike) -> str:
+    def replace_extension(self, path: FilePath) -> str:
         """
         Замена расширения файла в пути path в соответствии с вариацией.
         """
         format = self.output_format(path)
         return utils.replace_extension(path, format)
 
-    def _detect_format(self, outfile: FilePtr) -> str:
+    def _detect_format(self, outfile: FilePointer) -> str:
         if isinstance(outfile, (str, Path)):
             return self.output_format(outfile)
         elif hasattr(outfile, "name"):
@@ -337,7 +337,7 @@ class Variation:
         else:
             return conf.FALLBACK_FORMAT
 
-    def save(self, img: Image, outfile: FilePtr, **options):
+    def save(self, img: Image, outfile: FilePointer, **options):
         """
         Сохранение картинки в файл.
         """
@@ -348,7 +348,7 @@ class Variation:
         format = format.lower()
 
         # настройки для конкретного формата
-        format_options = {}  # type: Dict[str, Any]
+        format_options = {}
         format_options.update(self.extra_context.get(format, {}))
         for k, v in format_options.items():
             opts.setdefault(k, v)

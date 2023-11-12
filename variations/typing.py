@@ -1,7 +1,8 @@
-from pathlib import Path
-from typing import IO, List, Tuple, Union
+import os
+from collections.abc import Sequence
+from typing import IO, Union
 
-PathLike = Union[str, Path]
-FilePtr = Union[str, Path, IO]
-Size = Union[Tuple[int, int], List[int]]
-Color = Union[str, Tuple[int, int, int], Tuple[int, int, int, int]]
+FilePath = Union[str, os.PathLike[str]]
+FilePointer = Union[FilePath, IO]
+Size = Sequence[Union[int, float]]
+Color = Union[str, tuple[int, int, int], tuple[int, int, int, int]]
