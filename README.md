@@ -8,7 +8,7 @@ A simple interface that allows processing of images.
 
 ## Compatibility
 
--   `python` >= 3.7
+-   `python` >= 3.9
 
 ## Installation
 
