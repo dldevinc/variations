@@ -286,13 +286,19 @@ class Variation:
         """
         canvas_size = self.get_output_size(size)
         if self.clip:
-            proc = processors.FaceDetectionResizeToFill(
-                width=canvas_size[0],
-                height=canvas_size[1],
-                anchor=self.anchor,
-                upscale=self._upscale,
-                face_detection=self.face_detection,
-            )
+            if self.face_detection:
+                proc = processors.ResizeToFillFace(
+                    width=canvas_size[0],
+                    height=canvas_size[1],
+                    upscale=self._upscale,
+                )
+            else:
+                proc = processors.ResizeToFill(
+                    width=canvas_size[0],
+                    height=canvas_size[1],
+                    anchor=self.anchor,
+                    upscale=self._upscale,
+                )
         else:
             proc = processors.ResizeToFit(
                 width=canvas_size[0],

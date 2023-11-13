@@ -91,7 +91,7 @@ class TestCustomFilter:
         variation = Variation(
             size=(120, 80),
             face_detection=True,
-            format="webp",
+            format="png",
             webp=dict(quality=0,),
             preprocessors=[processors.MakeOpaque("#FFFF00")],
             postprocessors=[processors.StackBlur(10)],
@@ -113,5 +113,5 @@ class TestCustomFilter:
 
             # check output
             target_path = helper.TARGET_PATH / relative_path
-            target_path = replace_extension(target_path, "webp")
+            target_path = replace_extension(target_path, "png")
             assert helper.image_diff(output_path, target_path) is None
