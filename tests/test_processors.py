@@ -1,6 +1,6 @@
 from pilkit.lib import Image
 
-from variations.processors import ColorOverlay, MakeOpaque, ResizeToFillFace
+from variations.processors import ColorOverlay, CropFace, MakeOpaque, ResizeToFillFace
 
 from . import helper
 
@@ -53,7 +53,7 @@ class TestResizeToFillFace:
     def test_files(self, input_file):
         input_file_path = str(helper.INPUT_PATH / input_file)
         with open(input_file_path, "rb") as fp:
-            output_path = helper.OUTPUT_PATH / "processors/faces" / input_file.name
+            output_path = helper.OUTPUT_PATH / "processors/resize" / input_file.name
             if not output_path.parent.is_dir():
                 output_path.parent.mkdir(parents=True, exist_ok=True)
 
@@ -66,5 +66,28 @@ class TestResizeToFillFace:
             new_img.save(output_path)
 
             # check output
-            target_path = helper.TARGET_PATH / "processors/faces" / input_file.name
+            target_path = helper.TARGET_PATH / "processors/resize" / input_file.name
+            assert helper.image_diff(output_path, target_path) is None
+
+
+class TestCropFace:
+    input_files = ["faces"]
+
+    def test_files(self, input_file):
+        input_file_path = str(helper.INPUT_PATH / input_file)
+        with open(input_file_path, "rb") as fp:
+            output_path = helper.OUTPUT_PATH / "processors/crop" / input_file.name
+            if not output_path.parent.is_dir():
+                output_path.parent.mkdir(parents=True, exist_ok=True)
+
+            img = Image.open(fp)
+            new_img = CropFace(300, 300).process(img)
+
+            if output_path.suffix == ".jpg":
+                new_img = new_img.convert("RGB")
+
+            new_img.save(output_path)
+
+            # check output
+            target_path = helper.TARGET_PATH / "processors/crop" / input_file.name
             assert helper.image_diff(output_path, target_path) is None

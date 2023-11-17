@@ -3,45 +3,56 @@ from collections import namedtuple
 from pathlib import Path
 from typing import Any, Dict, Optional
 
-from pilkit.exceptions import UnknownFormat
+from pilkit.exceptions import UnknownExtension
 from pilkit.lib import Image
-from pilkit.utils import format_to_extension
+from pilkit.utils import extension_to_format, format_to_extension
 
+from . import conf
 from .processors import Transpose
 from .typing import Color, FilePath, FilePointer, Size
 
 
 def guess_format(fp: FilePointer) -> Optional[str]:
     """
-    Определение формата изображение по расширению файла.
+    Determine the image format based on the file extension.
     """
-    if isinstance(fp, (str, Path)):
-        filename = str(fp)
+    if isinstance(fp, Path):
+        extension = fp.suffix
+    elif isinstance(fp, str):
+        extension = os.path.splitext(fp)[1]
     elif hasattr(fp, "name"):
-        filename = fp.name
+        extension = os.path.splitext(fp.name)[1]
     else:
-        return None
-
-    ext = os.path.splitext(filename)[1].lower()
-    try:
-        return Image.EXTENSION[ext]
-    except KeyError:
-        return None
-
-
-def replace_extension(path: FilePath, format: str) -> str:
-    """
-    Замена расширения файла в пути path на наиболее подходящее для формата format.
-    """
-    path = str(path)
+        raise ValueError(
+            "Invalid file pointer. It must be a string, Path, or have a 'name' attribute."
+        )
 
     try:
-        suggested_extension = format_to_extension(format)
-    except UnknownFormat:
-        return path
+        return extension_to_format(extension)
+    except UnknownExtension:
+        return conf.FALLBACK_FORMAT
 
-    root, original_ext = os.path.splitext(path)
-    return "".join((root, suggested_extension))
+
+def replace_extension(path: FilePath, format: str = None) -> FilePath:
+    """
+    Replace the file extension in the path with the most suitable one
+    for the specified format. If no format is specified, the format
+    to use is determined from the filename extension, if possible.
+
+    Example:
+        from variations.utils import replace_extension
+
+        variation = Variation(...)
+        destination_path = replace_extension("result.jpg", variation.format)
+        variation.save(img, destination_path)
+    """
+    suggested_extension = format_to_extension(format or guess_format(path))
+
+    if isinstance(path, Path):
+        return path.with_suffix(suggested_extension)
+    else:
+        root, ext = os.path.splitext(path)
+        return root + suggested_extension
 
 
 def apply_exif_orientation(img: Image, info: Dict[str, Any] = None) -> Image:
@@ -87,6 +98,14 @@ def prepare_image(
     2) Примененяет ориентацию картинки, указанную в EXIF-данных
     3) Заливка RGB-данных в прозрачных пикселях указанным цветом во избежание
        артефактов при ресайзе
+
+    Пример:
+        from variations.utils import prepare_image
+
+        variation = Variation(...)
+        img = Image.open('source.jpg')
+        img = prepare_image(img, draft_size=variation.get_output_size(img.size))
+        new_img = variation.process(img)
     """
     format = img.format
     if draft_size is not None and format == "JPEG":
