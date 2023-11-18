@@ -31,13 +31,13 @@ class MakeOpaque:
         self.background_color = background_color[:3]
 
     def process(self, img):
-        if ("transparency" not in img.info) and (img.mode not in ("LA", "PA", "RGBA")):
+        has_transparency = img.info.get("transparency") is not None
+        if not has_transparency and (img.mode not in ("LA", "PA", "RGBA")):
             return img
 
+        if img.mode == "P" and has_transparency:
+            img = img.convert("RGBA")
+
         new_img = Image.new("RGB", img.size, self.background_color)
-
-        if img.mode == "P":
-            img = img.convert()
-
         new_img.paste(img, img)
         return new_img
