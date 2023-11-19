@@ -5,15 +5,14 @@ from collections.abc import Mapping, Set
 from enum import Enum
 from itertools import chain
 from numbers import Integral, Real
-from pathlib import Path
 from typing import Any, Dict, Iterable, Union, cast
 
 from PIL import ImageColor
 from pilkit.exceptions import UnknownFormat
 from pilkit.lib import Image
-from pilkit.utils import format_to_extension, save_image
+from pilkit.utils import format_to_extension
 
-from . import processors, utils
+from . import conf, processors, utils
 from .scaler import Scaler
 from .typing import (
     Color,
@@ -566,6 +565,11 @@ class Variation:
         """
         Вычисление финальных размеров холста по размерам исходного изображения.
         """
+        warnings.warn(
+            "The 'get_output_size' method is deprecated.",
+            DeprecationWarning
+        )
+
         size = Scaler(*source_size, upscale=self.upscale)  # type: ignore
         if self.clip:
             if self.upscale:
@@ -706,6 +710,9 @@ class Variation:
         if self.legacy_mode:
             return self.get_processor(img.size).process(img)
         else:
+            if self.width and self.height:
+                img.draft(img.mode, self.size)
+            img = utils.apply_exif_orientation(img)
             return self.get_pipeline().process(img)
 
     def output_format(self, path: FilePath) -> str:
@@ -743,7 +750,10 @@ class Variation:
         opts = options.copy()
 
         final_format = (
-            format or self.format or utils.guess_format(fp)
+            format
+            or self.format
+            or utils.guess_format(fp)
+            or conf.MODE_TO_FORMAT[img.mode]
         ).upper()
 
         # Transfer additional parameters specific
@@ -753,27 +763,4 @@ class Variation:
         for k, v in format_options.items():
             opts.setdefault(k, v)
 
-        # Enable optimization by default
-        if final_format in {"JPEG", "PNG"}:
-            format_options.setdefault("optimize", True)
-
-        # FIX
-        # pilkit.utils.prepare_image() corrupts LA images by converting it to RGB.
-        # It also makes transparent WebP opaque.
-        if img.mode == "LA" or final_format == "WEBP":
-            autoconvert = False
-        else:
-            autoconvert = True
-
-        # FIX
-        # pilkit does not support pathlib.Path objects
-        if isinstance(fp, Path):
-            fp = str(fp)
-
-        save_image(
-            img,
-            fp,
-            format=final_format,
-            options=opts,
-            autoconvert=autoconvert
-        )
+        utils.save_image(img, fp, final_format, **opts)

@@ -1,14 +1,14 @@
 import os
-from collections import namedtuple
+import warnings
 from pathlib import Path
-from typing import Any, Dict, Optional
+from typing import Optional
 
 from pilkit.exceptions import UnknownExtension
 from pilkit.lib import Image
 from pilkit.utils import extension_to_format, format_to_extension
 
 from . import conf
-from .processors import Transpose
+from .processors import MakeOpaque, Transpose
 from .typing import Color, FilePath, FilePointer, Size
 
 
@@ -30,7 +30,7 @@ def guess_format(fp: FilePointer) -> Optional[str]:
     try:
         return extension_to_format(extension)
     except UnknownExtension:
-        return conf.FALLBACK_FORMAT
+        pass
 
 
 def replace_extension(path: FilePath, format: str = None) -> FilePath:
@@ -46,27 +46,26 @@ def replace_extension(path: FilePath, format: str = None) -> FilePath:
         destination_path = replace_extension("result.jpg", variation.format)
         variation.save(img, destination_path)
     """
-    suggested_extension = format_to_extension(format or guess_format(path))
+    suggested_extension = format_to_extension(
+        format
+        or guess_format(path)
+    )
 
-    if isinstance(path, Path):
-        return path.with_suffix(suggested_extension)
+    if suggested_extension:
+        if isinstance(path, Path):
+            return path.with_suffix(suggested_extension)
+        else:
+            root, ext = os.path.splitext(path)
+            return root + suggested_extension
     else:
-        root, ext = os.path.splitext(path)
-        return root + suggested_extension
+        return path
 
 
-def apply_exif_orientation(img: Image, info: Dict[str, Any] = None) -> Image:
+def apply_exif_orientation(img: Image) -> Image:
     """
-    Применение ориентации, указанной в EXIF-данных.
+    Applies the Exif orientation to the given image.
     """
-    from PIL.JpegImagePlugin import _getexif
-
-    if info:
-        obj = namedtuple("FakeImage", ["info"])(info)
-    else:
-        obj = img
-
-    exif = _getexif(obj)
+    exif = img.getexif()
     if not exif:
         return img
 
@@ -77,6 +76,7 @@ def apply_exif_orientation(img: Image, info: Dict[str, Any] = None) -> Image:
     ops = Transpose._EXIF_ORIENTATION_STEPS[orientation]
     for method in ops:
         img = Transpose(method).process(img)
+
     return img
 
 
@@ -84,6 +84,11 @@ def make_opaque(img: Image, color: Color = "#FFFFFF") -> Image:
     """
     Замена RGB-составляющей полностью прозрачных пикселей на указанный цвет.
     """
+    warnings.warn(
+        "The 'make_opaque' function is deprecated.",
+        DeprecationWarning
+    )
+
     img = img.convert("RGBA")
     overlay = Image.new("RGBA", img.size, color)
     return Image.alpha_composite(overlay, img)
@@ -107,6 +112,11 @@ def prepare_image(
         img = prepare_image(img, draft_size=variation.get_output_size(img.size))
         new_img = variation.process(img)
     """
+    warnings.warn(
+        "The 'prepare_image' function is deprecated.",
+        DeprecationWarning
+    )
+
     format = img.format
     if draft_size is not None and format == "JPEG":
         img.draft(img.mode, draft_size)
@@ -115,3 +125,39 @@ def prepare_image(
     if background_color is not None:
         img = make_opaque(img, background_color)
     return img
+
+
+def save_image(img: Image, fp: FilePointer, format: str, **options):
+    """
+    Wraps PIL's ``Image.save()`` method.
+    """
+    format = format.upper()
+
+    if img.mode == "LA":
+        if format in conf.RGBA_TRANSPARENCY_FORMATS:
+            pass
+        elif format in conf.PALETTE_TRANSPARENCY_FORMATS:
+            # При сохранении LA в GIF теряются все цвета.
+            # При конвертации в PA - тоже.
+            img = img.convert("RGBA")
+        else:
+            # LA нельзя сохранить в формат, не поддерживающий прозрачность.
+            img = MakeOpaque().process(img)
+    elif img.mode in {"P", "PA"}:
+        transparency = img.info.get("transparency")
+        if format == "GIF" and isinstance(transparency, bytes):
+            img = img.convert("RGBA")
+        elif format not in conf.TRANSPARENCY_FORMATS:
+            if transparency is None:
+                img = img.convert("RGB")
+            else:
+                img = MakeOpaque().process(img)
+    elif img.mode == "RGBA":
+        if format not in conf.TRANSPARENCY_FORMATS:
+            img = MakeOpaque().process(img)
+
+    # Enable optimization by default
+    if format in {"JPEG", "PNG"}:
+        options.setdefault("optimize", True)
+
+    img.save(fp, format=format, **options)
