@@ -446,7 +446,7 @@ class TestSave:
         v = Variation(size=(100, 200))
         img = Image.new("RGB", (640, 480), color="red")
 
-        output_path = helper.OUTPUT_PATH / "save/str.jpg"
+        output_path = helper.OUTPUT_PATH / "save/output/str.jpg"
         if not output_path.parent.is_dir():
             output_path.parent.mkdir(parents=True, exist_ok=True)
 
@@ -456,7 +456,7 @@ class TestSave:
         v = Variation(size=(100, 200))
         img = Image.new("RGB", (640, 480), color="red")
 
-        output_path = helper.OUTPUT_PATH / "save/path.jpg"
+        output_path = helper.OUTPUT_PATH / "save/output/path.jpg"
         if not output_path.parent.is_dir():
             output_path.parent.mkdir(parents=True, exist_ok=True)
 
@@ -466,7 +466,7 @@ class TestSave:
         v = Variation(size=(100, 200))
         img = Image.new("RGB", (640, 480), color="red")
 
-        output_path = helper.OUTPUT_PATH / "save/io.jpg"
+        output_path = helper.OUTPUT_PATH / "save/output/io.jpg"
         if not output_path.parent.is_dir():
             output_path.parent.mkdir(parents=True, exist_ok=True)
 

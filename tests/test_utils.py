@@ -4,8 +4,8 @@ from pathlib import Path
 import pytest
 from PIL import Image
 from pilkit.exceptions import UnknownFormat
-from pilkit.utils import save_image
-from variations import utils, conf
+
+from variations import utils
 
 from . import helper
 
@@ -14,13 +14,13 @@ def test_guess_format():
     assert utils.guess_format("image.jpg") == "JPEG"
     assert utils.guess_format("image.jpeg") == "JPEG"
     assert utils.guess_format("image.WebP") == "WEBP"
-    assert utils.guess_format("image") == conf.FALLBACK_FORMAT
-    assert utils.guess_format("image.mp3") == conf.FALLBACK_FORMAT
+    assert utils.guess_format("image") is None
+    assert utils.guess_format("image.mp3") is None
 
     assert utils.guess_format(Path("/tmp/image.png")) == "PNG"
     assert utils.guess_format(Path("/tmp/image.webP")) == "WEBP"
-    assert utils.guess_format(Path("/tmp/image")) == conf.FALLBACK_FORMAT
-    assert utils.guess_format(Path("/tmp/image.mp3")) == conf.FALLBACK_FORMAT
+    assert utils.guess_format(Path("/tmp/image")) is None
+    assert utils.guess_format(Path("/tmp/image.mp3")) is None
 
     with io.BytesIO() as file:
         with pytest.raises(ValueError):
@@ -30,7 +30,7 @@ def test_guess_format():
         assert utils.guess_format(file) == "GIF"
 
         file.name = "image.mp3"
-        assert utils.guess_format(file) == conf.FALLBACK_FORMAT
+        assert utils.guess_format(file) is None
 
 
 def test_replace_extension():
@@ -51,28 +51,169 @@ def test_replace_extension():
     assert utils.replace_extension(Path("image"), "webp") == Path("image.webp")
 
 
-@pytest.mark.parametrize("format", ["png", "jpeg", "tiff", "gif", "webp"])
-@pytest.mark.parametrize("source_folder", ["png", "jpg", "gif", "webp"])
-def test_opaque_background(source_folder, format):  # TODO: зачем это?
-    results = []
+class TestSaveBase:
+    file = None
 
-    input_folder = helper.INPUT_PATH / source_folder
-    for input_path in sorted(input_folder.iterdir()):
-        original = Image.open(input_path)
-        img = utils.prepare_image(original, background_color=(255, 0, 0, 128))
+    def _test_file(self, to_format):
+        if to_format == "JPEG":
+            suffix = ".jpg"
+        else:
+            suffix = f".{to_format.lower()}"
 
-        relative_path = Path("opaque") / source_folder / format / input_path.relative_to(input_folder)
-        output_path = helper.OUTPUT_PATH / relative_path
+        output_path = helper.OUTPUT_PATH / "save" / self.file.stem / self.file.name
         if not output_path.parent.is_dir():
             output_path.parent.mkdir(parents=True, exist_ok=True)
+        output_path = output_path.with_suffix(suffix)
 
-        output_path = utils.replace_extension(output_path, format)
-        save_image(img, str(output_path), format=format)
+        img = Image.open(self.file)
+        utils.save_image(img, output_path, to_format)
 
-        target_path = helper.TARGET_PATH / relative_path
-        target_path = utils.replace_extension(target_path, format)
+        target_path = helper.TARGET_PATH / "save" / self.file.stem / output_path.name
+        if target_path.exists():
+            assert helper.image_diff(output_path, target_path) is None
+        else:
+            print(f"ERROR: {target_path} not exist")
 
-        results.append((output_path, target_path))
 
-    for output_path, target_path in results:
-        assert helper.image_diff(output_path, target_path) is None
+class TestSave1(TestSaveBase):
+    file = helper.INPUT_PATH / "formats/png/1.png"
+
+    def test_jpg(self):
+        self._test_file("JPEG")
+
+    def test_gif(self):
+        self._test_file("GIF")
+
+    def test_png(self):
+        self._test_file("PNG")
+
+    def test_webp(self):
+        self._test_file("WEBP")
+
+
+class TestSaveL(TestSaveBase):
+    file = helper.INPUT_PATH / "formats/png/L.png"
+
+    def test_jpg(self):
+        self._test_file("JPEG")
+
+    def test_gif(self):
+        self._test_file("GIF")
+
+    def test_png(self):
+        self._test_file("PNG")
+
+    def test_webp(self):
+        self._test_file("WEBP")
+
+
+class TestSaveLA(TestSaveBase):
+    file = helper.INPUT_PATH / "formats/png/LA.png"
+
+    def test_jpg(self):
+        self._test_file("JPEG")
+
+    def test_gif(self):
+        self._test_file("GIF")
+
+    def test_png(self):
+        self._test_file("PNG")
+
+    def test_webp(self):
+        self._test_file("WEBP")
+
+
+class TestSaveLA2(TestSaveBase):
+    file = helper.INPUT_PATH / "formats/png/LA2.png"
+
+    def test_jpg(self):
+        self._test_file("JPEG")
+
+    def test_gif(self):
+        self._test_file("GIF")
+
+    def test_png(self):
+        self._test_file("PNG")
+
+    def test_webp(self):
+        self._test_file("WEBP")
+
+
+class TestSaveP(TestSaveBase):
+    file = helper.INPUT_PATH / "formats/png/P.png"
+
+    def test_jpg(self):
+        self._test_file("JPEG")
+
+    def test_gif(self):
+        self._test_file("GIF")
+
+    def test_png(self):
+        self._test_file("PNG")
+
+    def test_webp(self):
+        self._test_file("WEBP")
+
+
+class TestSavePA(TestSaveBase):
+    file = helper.INPUT_PATH / "formats/png/PA.png"
+
+    def test_jpg(self):
+        self._test_file("JPEG")
+
+    def test_gif(self):
+        self._test_file("GIF")
+
+    def test_png(self):
+        self._test_file("PNG")
+
+    def test_webp(self):
+        self._test_file("WEBP")
+
+
+class TestSaveRGB(TestSaveBase):
+    file = helper.INPUT_PATH / "formats/png/RGB.png"
+
+    def test_jpg(self):
+        self._test_file("JPEG")
+
+    def test_gif(self):
+        self._test_file("GIF")
+
+    def test_png(self):
+        self._test_file("PNG")
+
+    def test_webp(self):
+        self._test_file("WEBP")
+
+
+class TestSaveRGBA(TestSaveBase):
+    file = helper.INPUT_PATH / "formats/png/RGBA.png"
+
+    def test_jpg(self):
+        self._test_file("JPEG")
+
+    def test_gif(self):
+        self._test_file("GIF")
+
+    def test_png(self):
+        self._test_file("PNG")
+
+    def test_webp(self):
+        self._test_file("WEBP")
+
+
+class TestSaveRGBA2(TestSaveBase):
+    file = helper.INPUT_PATH / "formats/png/RGBA2.png"
+
+    def test_jpg(self):
+        self._test_file("JPEG")
+
+    def test_gif(self):
+        self._test_file("GIF")
+
+    def test_png(self):
+        self._test_file("PNG")
+
+    def test_webp(self):
+        self._test_file("WEBP")
