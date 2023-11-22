@@ -20,8 +20,6 @@ class Crop:
         self.y = y
 
     def process(self, img):
-        from .resize import ResizeCanvas
-
         original_width, original_height = img.size
         new_width = int(
             min(original_width, self.width)
@@ -34,6 +32,15 @@ class Crop:
             else original_height
         )
 
+        if (
+            self.x is None
+            and self.y is None
+            and new_width == original_width
+            and new_height == original_height
+        ):
+            return img
+
+        from .resize import ResizeCanvas
         return ResizeCanvas(
             new_width,
             new_height,
