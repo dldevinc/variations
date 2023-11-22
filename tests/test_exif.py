@@ -6,17 +6,16 @@ from variations.variation import Variation
 from . import helper
 
 
+@pytest.mark.iterdir("file", "tests/input/exif")
 class TestExifOrientation:
-    @pytest.mark.iterdir("file", "tests/input/exif")
     def test_exif(self, file):
         output_path = helper.OUTPUT_PATH / "exif" / file.name
         if not output_path.parent.is_dir():
             output_path.parent.mkdir(parents=True, exist_ok=True)
 
         variation = Variation(size=(1024, 768))
-        with open(file, "rb") as fp:
-            img = Image.open(fp)
-            new_img = variation.process(img)
+        img = Image.open(file)
+        new_img = variation.process(img)
         variation.save(new_img, output_path)
 
         # check output

@@ -123,19 +123,18 @@ class BaseTest:
         if not output_path.parent.is_dir():
             output_path.parent.mkdir(parents=True, exist_ok=True)
 
-        with open(file, "rb") as fp:
-            img = Image.open(fp)
-            variation = Variation(
-                size=size,
-                mode=self.mode,
-                upscale=upscale if upscale is not None else NOT_SET,
-                background=self.background,
-                preprocessors=preprocessors,
-                postprocessors=postprocessors
-            )
-            new_img = variation.process(img)
-            assert new_img.size == expected_size
-            variation.save(new_img, output_path)
+        img = Image.open(file)
+        variation = Variation(
+            size=size,
+            mode=self.mode,
+            upscale=upscale if upscale is not None else NOT_SET,
+            background=self.background,
+            preprocessors=preprocessors,
+            postprocessors=postprocessors
+        )
+        new_img = variation.process(img)
+        assert new_img.size == expected_size
+        variation.save(new_img, output_path)
 
         # check output
         target_path = helper.TARGET_PATH / "formats" / format_folder / self.prefix / overlay_folder / filename
