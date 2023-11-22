@@ -3,6 +3,7 @@ from pilkit.lib import Image
 
 from variations.processors import *
 from variations.processors.face_detection import CropFace, ResizeToFillFace
+from variations.utils import save_image
 
 from . import helper
 
@@ -200,11 +201,7 @@ class TestFilters:
         with open(file, "rb") as fp:
             img = Image.open(fp)
             new_img = filter.process(img)
-
-            if new_img.mode in {"LA", "RGBA"} and output_path.suffix == ".jpg":
-                new_img = MakeOpaque().process(new_img)
-
-            new_img.save(output_path)
+            save_image(new_img, output_path)
 
         # check output
         target_path = helper.TARGET_PATH / "processors/filters" / folder / file.name

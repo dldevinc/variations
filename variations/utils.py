@@ -127,11 +127,15 @@ def prepare_image(
     return img
 
 
-def save_image(img: Image, fp: FilePointer, format: str, **options):
+def save_image(img: Image, fp: FilePointer, format: str = None, **options):
     """
     Wraps PIL's ``Image.save()`` method.
     """
-    format = format.upper()
+    format = (
+        format
+        or guess_format(fp)
+        or conf.MODE_TO_FORMAT[img.mode]
+    ).upper()
 
     if img.mode == "LA":
         if format in conf.RGBA_TRANSPARENCY_FORMATS:
