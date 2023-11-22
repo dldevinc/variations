@@ -642,51 +642,63 @@ class Variation:
         pipeline = list(chain(self.preprocessors, [proc], self.postprocessors))
         return processors.ProcessorPipeline(pipeline)
 
-    def _get_fill_processor(self) -> ProcessorProtocol:
+    def _get_fill_processors(self) -> Iterable[ProcessorProtocol]:
         if not self.width or not self.height:
-            return processors.ResizeToFit(
-                self.width or None,
-                self.height or None,
-                upscale=self.upscale
-            )
+            return [
+                processors.ResizeToFit(
+                    self.width or None,
+                    self.height or None,
+                    upscale=self.upscale
+                )
+            ]
 
         if self.gravity is self.Gravity.AUTO:
             from processors.face_detection import ResizeToFillFace
-            return ResizeToFillFace(
-                self.width or None,
-                self.height or None,
-                upscale=self.upscale
-            )
+            return [
+                ResizeToFillFace(
+                    self.width or None,
+                    self.height or None,
+                    upscale=self.upscale
+                )
+            ]
         else:
-            return processors.ResizeToFill(
+            return [
+                processors.ResizeToFill(
+                    self.width or None,
+                    self.height or None,
+                    anchor=self.gravity,
+                    upscale=self.upscale
+                )
+            ]
+
+    def _get_fit_processors(self) -> Iterable[ProcessorProtocol]:
+        return [
+            processors.ResizeToFit(
                 self.width or None,
                 self.height or None,
                 anchor=self.gravity,
-                upscale=self.upscale
+                upscale=self.upscale,
+                mat_color=self.background
             )
+        ]
 
-    def _get_fit_processor(self) -> ProcessorProtocol:
-        return processors.ResizeToFit(
-            self.width or None,
-            self.height or None,
-            anchor=self.gravity,
-            upscale=self.upscale,
-            mat_color=self.background
-        )
-
-    def _get_crop_processor(self) -> ProcessorProtocol:
+    def _get_crop_processors(self) -> Iterable[ProcessorProtocol]:
         if self.gravity is self.Gravity.AUTO:
             from processors.face_detection import CropFace
-            return CropFace(
-                self.width or None,
-                self.height or None,
-            )
+            return [
+                CropFace(
+                    self.width or None,
+                    self.height or None,
+                )
+            ]
         else:
-            return processors.Crop(
-                self.width or None,
-                self.height or None,
-                anchor=self.gravity,
-            )
+            return [
+                processors.Crop(
+                    self.width or None,
+                    self.height or None,
+                    anchor=self.gravity,
+                )
+            ]
 
     def get_pipeline(self) -> processors.ProcessorPipeline:
         pipeline = list(self.preprocessors)
@@ -694,11 +706,11 @@ class Variation:
         if self.mode is self.Mode.NONE or self.size == (0, 0):
             pass
         elif self.mode is self.Mode.FILL:
-            pipeline.append(self._get_fill_processor())
+            pipeline.extend(self._get_fill_processors())
         elif self.mode is self.Mode.FIT:
-            pipeline.append(self._get_fit_processor())
+            pipeline.extend(self._get_fit_processors())
         else:
-            pipeline.append(self._get_crop_processor())
+            pipeline.extend(self._get_crop_processors())
 
         pipeline.extend(self.postprocessors)
         return processors.ProcessorPipeline(pipeline)
