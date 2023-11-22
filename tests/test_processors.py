@@ -59,7 +59,7 @@ class TestCrop:
         # check output
         target_path = helper.TARGET_PATH / "processors/crop" / folder / file.name
         if target_path.exists():
-            assert helper.image_diff(output_path, target_path) is None
+            assert helper.image_diff(output_path, target_path, mode="RGBA") is None
         else:
             print(f"ERROR: {target_path} not exist")
 

@@ -140,7 +140,7 @@ class BaseTest:
         # check output
         target_path = helper.TARGET_PATH / "formats" / format_folder / self.prefix / overlay_folder / filename
         if target_path.exists():
-            assert helper.image_diff(output_path, target_path) is None
+            assert helper.image_diff(output_path, target_path, mode="RGBA") is None
         else:
             print(f"ERROR: {target_path} not exist")
 
