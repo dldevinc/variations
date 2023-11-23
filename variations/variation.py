@@ -28,6 +28,49 @@ NOT_SET = object()
 
 
 class Variation:
+    """
+    Represents an image variation with configurable parameters.
+
+    Parameters:
+    - `size` (tuple): Tuple of width and height defining the size of the variation.
+    - `mode` (str, optional): Mode of the variation (fill, fit, crop, none). Defaults to 'fill'.
+    - `upscale` (bool, optional): Boolean indicating whether upscaling is allowed. Defaults to False.
+    - `gravity` (str or tuple, optional): Gravity of the variation, specifying the position or anchor point.
+    - `background` (str or tuple, optional): Background color for the variation.
+    - `format` (str, optional): The desired output image format.
+    - `preprocessors` (iterable, optional): Iterable of processors to apply before the main processing.
+    - `postprocessors` (iterable, optional): Iterable of processors to apply after the main processing.
+    - `**kwargs`: Additional options.
+
+    Methods:
+    - `process(img: Image) -> Image`: Process an image according to the variation parameters.
+    - `save(img: Image, fp: FilePointer, format=None, **options)`: Save the processed image to a file.
+
+    Example:
+    ```python
+    from PIL import Image
+    from variations import Variation, processors
+
+    # Create a variation with specific parameters
+    variation = Variation(
+        size=(800, 600),
+        mode=Variation.Mode.FIT,
+        background="#FFFFFF",
+        preprocessors=[
+            processors.Grayscale()
+        ],
+    )
+
+    img = Image.open("source.png")
+
+    # Process an image using the variation
+    processed_image = variation.process(img)
+
+    # Save the processed image to a destination file
+    variation.save(processed_image, "dest.jpg")
+    ```
+
+    """
     class Mode(Enum):
         FILL = "fill"
         FIT = "fit"
