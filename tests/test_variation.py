@@ -10,7 +10,7 @@ from . import helper
 
 
 class TestSize:
-    def test_empty_size(self):
+    def test_empty(self):
         with pytest.raises(ValueError, match="'size' parameter is required"):
             Variation()
 
@@ -22,8 +22,9 @@ class TestSize:
         [10, -1.6],
         ("-100", "200"),
         {100: 10, 200: 20},
+        (x for x in [100, 200]),
     ])
-    def test_invalid_size_types(self, size):
+    def test_invalid_type(self, size):
         with pytest.raises(TypeError, match="argument must be a sequence"):
             Variation(size)
 
@@ -33,9 +34,8 @@ class TestSize:
         (100,),
         (-100, -200),
         [100, 200, 300],
-        (x for x in [100, 200]),
     ])
-    def test_invalid_size_value(self, size):
+    def test_invalid_value(self, size):
         with pytest.raises(ValueError, match="argument must be a sequence"):
             Variation(size)
 
@@ -44,7 +44,7 @@ class TestSize:
         (100, 200),
         [100, 200],
     ])
-    def test_valid_size(self, size):
+    def test_valid(self, size):
         Variation(size)
 
 
@@ -67,7 +67,7 @@ class TestMode:
         v = Variation(size=(640, 480), mode=mode_string)
         assert v.mode is expected
 
-    def test_invalid_mode_value(self):
+    def test_invalid_value(self):
         with pytest.raises(ValueError, match="Invalid mode"):
             Variation(size=(640, 480), mode="unknown")
 

@@ -1,7 +1,7 @@
 import os
 from abc import abstractmethod
-from collections.abc import Sequence, Iterable
-from numbers import Integral, Real
+from collections.abc import Collection, Sequence
+from numbers import Real
 from typing import IO, Protocol, Union, runtime_checkable
 
 from PIL import Image
@@ -16,8 +16,8 @@ class ProcessorProtocol(Protocol):
 
 FilePath = Union[str, os.PathLike[str]]
 FilePointer = Union[FilePath, IO]
-Dimension = Integral
+Dimension = int
 Size = Sequence[Dimension]
-Color = Union[str, Iterable[int]]
+Color = Union[str, Collection[int]]
 Rectangle = tuple[int, int, int, int]
 GravityTuple = Sequence[Real]

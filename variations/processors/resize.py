@@ -64,10 +64,12 @@ class ResizeToFit:
                 Fraction(self.height, original_height)
             )
         else:
-            if self.width is None:
+            if self.width is None and self.height is not None:
                 ratio = Fraction(self.height, original_height)
-            else:
+            elif self.width is not None and self.height is None:
                 ratio = Fraction(self.width, original_width)
+            else:
+                return img
 
         new_dimensions = (
             round(original_width * ratio),

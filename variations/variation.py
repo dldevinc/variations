@@ -1,11 +1,11 @@
 import copy
 import logging
 import warnings
-from collections.abc import Mapping, Set
+from collections.abc import Collection, Mapping, Set
 from enum import Enum
 from itertools import chain
-from numbers import Integral, Real
-from typing import Any, Dict, Iterable, Union, cast
+from numbers import Real
+from typing import Any, Dict, Iterable, Union
 
 from PIL import ImageColor
 from pilkit.exceptions import UnknownFormat
@@ -235,8 +235,8 @@ class Variation:
 
         if (
             isinstance(value, (Mapping, Set, str, bytes))
-            or not isinstance(value, Iterable)
-            or not all(isinstance(x, Integral) for x in value)
+            or not isinstance(value, Collection)
+            or not all(isinstance(x, int) for x in value)
         ):
             raise TypeError(error_msg)
 
@@ -291,11 +291,10 @@ class Variation:
                 raise ValueError(error_msg)
         elif (
             isinstance(value, (Mapping, Set, bytes))
-            or not isinstance(value, (self.Gravity, Iterable))
+            or not isinstance(value, (self.Gravity, Collection))
         ):
             raise TypeError(error_msg)
 
-        value = cast(Union[self.Gravity, GravityTuple], value)
         if value is self.Gravity.AUTO:
             self._gravity = value
             return
@@ -342,12 +341,10 @@ class Variation:
 
         if (
             isinstance(value, (Mapping, Set, bytes))
-            or not isinstance(value, Iterable)
-            or not all(isinstance(x, Integral) for x in value)
+            or not isinstance(value, Collection)
+            or not all(isinstance(x, int) for x in value)
         ):
             raise TypeError(error_msg)
-
-        value = tuple(int(x) for x in value)
 
         if len(value) == 3:
             value += (255, )
@@ -400,17 +397,16 @@ class Variation:
         return self._max_width
 
     @max_width.setter
-    def max_width(self, value: Integral):
+    def max_width(self, value: int):
         warnings.warn(
             "The 'max_width' attribute is deprecated. Use 'size' attribute instead.",
             DeprecationWarning
         )
 
         error_msg = "'max_width' argument must be a non-negative integer"
-        if not isinstance(value, Integral):
+        if not isinstance(value, int):
             raise TypeError(error_msg)
 
-        value = int(value)
         if value < 0:
             raise ValueError(error_msg)
 
@@ -431,17 +427,16 @@ class Variation:
         return self._max_height
 
     @max_height.setter
-    def max_height(self, value: Integral):
+    def max_height(self, value: int):
         warnings.warn(
             "The 'max_height' attribute is deprecated. Use 'size' attribute instead.",
             DeprecationWarning
         )
 
         error_msg = "'max_height' argument must be a non-negative integer"
-        if not isinstance(value, Integral):
+        if not isinstance(value, int):
             raise TypeError(error_msg)
 
-        value = int(value)
         if value < 0:
             raise ValueError(error_msg)
 
@@ -480,7 +475,7 @@ class Variation:
 
         if (
             isinstance(value, (Mapping, Set, bytes))
-            or not isinstance(value, Iterable)
+            or not isinstance(value, Collection)
             or not all(isinstance(x, Real) for x in value)
         ):
             raise TypeError(error_msg)
@@ -688,6 +683,9 @@ class Variation:
     def _get_fill_processors(self) -> Iterable[ProcessorProtocol]:
         if not self.width or not self.height:
             return [
+                # Процессор ResizeToFit без указания mat_color
+                # тождественен требуемому процессору Resize,
+                # но включает в себя вычисление итоговых размеров.
                 processors.ResizeToFit(
                     self.width or None,
                     self.height or None,
