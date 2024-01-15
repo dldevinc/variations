@@ -2,7 +2,9 @@ import copy
 import logging
 import warnings
 from collections.abc import Collection, Mapping, Set
+from decimal import Decimal
 from enum import Enum
+from fractions import Fraction
 from itertools import chain
 from numbers import Real
 from typing import Any, Dict, Iterable, Union
@@ -15,6 +17,7 @@ from pilkit.utils import format_to_extension
 from . import conf, processors, utils
 from .scaler import Scaler
 from .typing import (
+    AspectRatio,
     Color,
     Dimension,
     FilePath,
@@ -33,6 +36,8 @@ class Variation:
 
     Parameters:
     - `size` (tuple): Tuple of width and height defining the size of the variation.
+    - `aspect_ratio` (float or Fraction, optional): Specifies the aspect ratio of the processed image.
+      If provided, it adjusts the size to maintain the specified aspect ratio.
     - `mode` (str, optional): Mode of the variation (fill, fit, crop, none). Defaults to 'fill'.
     - `upscale` (bool, optional): Boolean indicating whether upscaling is allowed. Defaults to False.
     - `gravity` (str or tuple, optional): Gravity of the variation, specifying the position or anchor point.
@@ -98,6 +103,7 @@ class Variation:
         mode: Mode = NOT_SET,
         upscale: bool = NOT_SET,
         gravity: Gravity = NOT_SET,
+        aspect_ratio: AspectRatio = NOT_SET,
         background: Color = NOT_SET,
         max_width: int = NOT_SET,           # deprecated
         max_height: int = NOT_SET,          # deprecated
@@ -112,11 +118,24 @@ class Variation:
         self.legacy_mode = NOT_SET
 
         if size is NOT_SET:
-            raise ValueError(
-                "The 'size' parameter is required and must be a tuple of width and height."
-            )
+            if aspect_ratio is NOT_SET:
+                raise TypeError(
+                    "Either the 'size' parameter or the 'aspect_ratio' parameter must be specified."
+                )
+            else:
+                self.size = (0, 0)
+                self.aspect_ratio = aspect_ratio
+                self.legacy_mode = False
         else:
             self.size = size
+
+            if aspect_ratio is NOT_SET:
+                self.aspect_ratio = None
+            elif all(x > 0 for x in self.size):
+                raise ValueError(
+                    "If 'aspect_ratio' is specified, at least one element in 'size' "
+                    "must be equal to 0."
+                )
 
         if mode is NOT_SET:
             self.mode = self.Mode.FILL
@@ -248,6 +267,35 @@ class Variation:
             raise ValueError(error_msg)
 
         self._size = formatted_value
+
+    @property
+    def aspect_ratio(self) -> Union[AspectRatio, None]:
+        return self._aspect_ratio
+
+    @aspect_ratio.setter
+    def aspect_ratio(self, value: AspectRatio):
+        if value is None:
+            self._aspect_ratio = value
+            return
+
+        if isinstance(value, (int, float)):
+            aspect_ratio = Fraction.from_float(value)
+        elif isinstance(value, Decimal):
+            aspect_ratio = Fraction.from_decimal(value)
+        elif isinstance(value, Fraction):
+            aspect_ratio = value
+        else:
+            raise TypeError(
+                "Unsupported type for 'aspect_ratio'. "
+                "Please provide an int, float, Decimal, or Fraction."
+            )
+
+        if aspect_ratio <= 0:
+            raise ValueError(
+                "Aspect ratio must be greater than 0."
+            )
+
+        self._aspect_ratio = aspect_ratio
 
     @property
     def mode(self) -> Mode:
@@ -744,7 +792,9 @@ class Variation:
     def get_pipeline(self) -> processors.ProcessorPipeline:
         pipeline = list(self.preprocessors)
 
-        if self.mode is self.Mode.NONE or self.size == (0, 0):
+        if self.mode is self.Mode.NONE:
+            pass
+        elif self.aspect_ratio is None and self.size == (0, 0):
             pass
         elif self.mode is self.Mode.FILL:
             pipeline.extend(self._get_fill_processors())

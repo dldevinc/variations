@@ -109,6 +109,11 @@ variation.save(processed_image, "dest.jpg")
 * Type: tuple of two non-negative integers
 * Description: Specifies the target size of the processed image in the format `(width, height)`.
 
+### `aspect_ratio` (optional)
+* Type: `float` or `Decimal` or `Fraction`
+* Description: Specifies the aspect ratio of the processed image. If provided, 
+  it adjusts the size to maintain the specified aspect ratio.
+
 ### `mode`
 * Type: `Variation.Mode`
 * Default: `Variation.Mode.FILL`

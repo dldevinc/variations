@@ -1,6 +1,8 @@
 import os
 from abc import abstractmethod
 from collections.abc import Collection, Sequence
+from decimal import Decimal
+from fractions import Fraction
 from numbers import Real
 from typing import IO, Protocol, Union, runtime_checkable
 
@@ -17,6 +19,7 @@ class ProcessorProtocol(Protocol):
 FilePath = Union[str, os.PathLike[str]]
 FilePointer = Union[FilePath, IO]
 Dimension = int
+AspectRatio = Union[int, float, Fraction, Decimal]
 Size = Sequence[Dimension]
 Color = Union[str, Collection[int]]
 Rectangle = tuple[int, int, int, int]

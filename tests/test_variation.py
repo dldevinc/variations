@@ -1,4 +1,7 @@
 import io
+from decimal import Decimal
+from fractions import Fraction
+
 import pytest
 from PIL import Image
 from pilkit import processors
@@ -11,8 +14,18 @@ from . import helper
 
 class TestSize:
     def test_empty(self):
-        with pytest.raises(ValueError, match="'size' parameter is required"):
+        with pytest.raises(TypeError, match="Either the 'size' parameter or the 'aspect_ratio'"):
             Variation()
+
+    def test_with_aspect_ratio(self):
+        v1 = Variation(aspect_ratio=4/3)
+        assert v1.size == (0, 0)
+
+        v2 = Variation(aspect_ratio=4/3, size=(1024, 0))
+        assert v2.size == (1024, 0)
+
+        with pytest.raises(ValueError, match="If 'aspect_ratio' is specified, at least one element"):
+            Variation(aspect_ratio=4/3, size=(1024, 768))
 
     @pytest.mark.parametrize("size", [
         None,
@@ -46,6 +59,51 @@ class TestSize:
     ])
     def test_valid(self, size):
         Variation(size)
+
+
+class TestAspectRatio:
+    def test_empty(self):
+        v = Variation((0, 0))
+        assert v.aspect_ratio is None
+
+    def test_with_empty_size(self):
+        v = Variation(aspect_ratio=4 / 3)
+        assert v.size == (0, 0)
+        assert v.aspect_ratio == 4 / 3
+        assert isinstance(v.aspect_ratio, Fraction)
+
+    @pytest.mark.parametrize("aspect_ratio", [
+        b"1.5",
+        "1.5",
+        (1.5, ),
+    ])
+    def test_invalid_type(self, aspect_ratio):
+        with pytest.raises(TypeError, match="Unsupported type"):
+            Variation(aspect_ratio=aspect_ratio)
+
+    @pytest.mark.parametrize("aspect_ratio", [
+        -1,
+        -0.5,
+        0,
+        0.0,
+        Decimal("0"),
+        Fraction(0, 4),
+        Fraction(-1, 3),
+    ])
+    def test_invalid_value(self, aspect_ratio):
+        with pytest.raises(ValueError, match="must be greater than 0."):
+            Variation(aspect_ratio=aspect_ratio)
+
+    @pytest.mark.parametrize("aspect_ratio", [
+        None,
+        2,
+        2.0,
+        4 / 3,
+        Decimal("0.75"),
+        Fraction(4, 3)
+    ])
+    def test_valid(self, aspect_ratio):
+        Variation(aspect_ratio=aspect_ratio)
 
 
 class TestMode:
