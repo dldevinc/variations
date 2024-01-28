@@ -125,7 +125,7 @@ variation.save(processed_image, "dest.jpg")
 * Description: Enables or disables upscaling of images.
 
 ### `background`
-* Type: `Color`
+* Type: `str` or `Collection[int]`
 * Default: `None`
 * Description: Specifies the background color. Used when the mode is set to `FIT`.
 
@@ -137,12 +137,12 @@ variation.save(processed_image, "dest.jpg")
 ### `preprocessors`
 * Type: `Iterable[ProcessorProtocol]` or `None`
 * Default: `None`
-* Description: A list of preprocessors to apply before the main processing step.
+* Description: A list of PILKit processors to apply before the main processing step.
 
 ### `postprocessors`
 * Type: `Iterable[ProcessorProtocol]` or `None`
 * Default: `None`
-* Description: A list of postprocessors to apply after the main processing step.
+* Description: A list of PILKit processors to apply after the main processing step.
 
 ### Other Parameters
 Additional parameters specific to particular image formats (e.g., `jpeg`, `webp`) can 
@@ -167,7 +167,7 @@ Old code:
 ```python
 Variation(
    size=(800, 600),
-   clip=True
+   clip=True    # can be omitted as it is the default value
 )
 ```
 
@@ -175,7 +175,7 @@ New code:
 ```python
 Variation(
    size=(800, 600),
-   mode=Variation.Mode.FILL,
+   mode=Variation.Mode.FILL,    # can be omitted as it is the default value
 )
 ```
 
@@ -189,8 +189,8 @@ Old code:
 ```python
 Variation(
    size=(800, 0),
-   clip=True,
-   upscale=False
+   clip=True,       # can be omitted as it is the default value
+   upscale=False    # can be omitted as it is the default value
 )
 ```
 
@@ -198,8 +198,8 @@ New code:
 ```python
 Variation(
    size=(800, 0),
-   mode=Variation.Mode.FILL,
-   upscale=False
+   mode=Variation.Mode.FILL,    # can be omitted as it is the default value
+   upscale=False                # can be omitted as it is the default value
 )
 ```
 
@@ -214,7 +214,7 @@ Old code:
 ```python
 Variation(
    size=(800, 0),
-   clip=True,
+   clip=True,       # can be omitted as it is the default value
    upscale=True
 )
 ```
@@ -223,7 +223,7 @@ New code:
 ```python
 Variation(
    size=(800, 0),
-   mode=Variation.Mode.FILL,
+   mode=Variation.Mode.FILL,    # can be omitted as it is the default value
    upscale=True
 )
 ```
@@ -234,7 +234,7 @@ Old code:
 ```python
 Variation(
    size=(200, 0),
-   clip=True,
+   clip=True,       # can be omitted as it is the default value
    upscale=True
 )
 ```
