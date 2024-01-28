@@ -1,4 +1,4 @@
-import logging
+from fractions import Fraction
 
 from pilkit.processors.resize import (
     AddBorder,
@@ -6,10 +6,11 @@ from pilkit.processors.resize import (
     ResizeCanvas,
     ResizeToCover,
     ResizeToFill,
-    ResizeToFit,
     SmartResize,
     Thumbnail,
 )
+
+from .base import Anchor
 
 __all__ = [
     "Resize",
@@ -20,86 +21,85 @@ __all__ = [
     "AddBorder",
     "ResizeToFit",
     "Thumbnail",
-    "FaceDetectionResizeToFill",
 ]
 
 
-class FaceDetectionResizeToFill(ResizeToFill):
+class ResizeToFit:
     """
-    Добавление функции определения лиц.
-    TODO: плохо, что приходится расширять процессор подобным образом ради подмены anchor.
+    Resizes an image to fit within the specified dimensions.
+
+    Исправлен баг в библиотеке pilkit, когда указано лишь одно значение
+    width или height, совсемтно с указание фонового цвета.
     """
 
-    def __init__(self, *args, face_detection=False, **kwargs):
-        self.face_detection = face_detection
-        super().__init__(*args, **kwargs)
+    def __init__(
+        self,
+        width=None,
+        height=None,
+        upscale=True,
+        mat_color=None,
+        anchor=Anchor.CENTER
+    ):
+        """
+        :param width: The maximum width of the desired image.
+        :param height: The maximum height of the desired image.
+        :param upscale: A boolean value specifying whether the image should
+            be enlarged if its dimensions are smaller than the target
+            dimensions.
+        :param mat_color: If set, the target image size will be enforced and the
+            specified color will be used as a background color to pad the image.
 
-    @staticmethod
-    def _detect_faces(img):
-        try:
-            import face_recognition
-            import numpy
-        except ImportError:
-            logging.warning(
-                "Cannot use face detection because 'face_recognition' is not installed."
-            )
-            return
-
-        if img.mode not in ("RGB", "L"):
-            clone = img.convert("RGB")
-            image_data = numpy.array(clone)
-        else:
-            image_data = numpy.array(img)
-
-        faces = face_recognition.face_locations(
-            image_data, number_of_times_to_upsample=0
-        )
-        if not faces:
-            return
-
-        rect = list(faces[0])
-        for face in faces[1:]:
-            top, right, bottom, left = face
-            rect[0] = min(rect[0], top)
-            rect[1] = max(rect[1], right)
-            rect[2] = max(rect[2], bottom)
-            rect[3] = min(rect[3], left)
-        return rect[3], rect[0], rect[1], rect[2]  # left, top, right, bottom
-
-    def _get_new_anchor(self, img, roi_rect):
-        original_width, original_height = img.size
-        ratio = max(
-            float(self.width) / original_width, float(self.height) / original_height
-        )
-        new_width, new_height = (
-            int(round(original_width * ratio)),
-            int(round(original_height * ratio)),
-        )
-
-        left, top, right, bottom = roi_rect
-        x = (left + right) / 2 * ratio
-        y = (top + bottom) / 2 * ratio
-        anchor_x = 0
-        if new_width != self.width:
-            anchor_x = max(0, min((x - self.width / 2) / (new_width - self.width), 1))
-        anchor_y = 0
-        if new_height != self.height:
-            anchor_y = max(
-                0, min((y - self.height / 2) / (new_height - self.height), 1)
-            )
-        return anchor_x, anchor_y
+        """
+        self.width = width
+        self.height = height
+        self.upscale = upscale
+        self.mat_color = mat_color
+        self.anchor = anchor
 
     def process(self, img):
-        rect = None
-        if self.face_detection:
-            rect = self._detect_faces(img)
+        original_width, original_height = img.size
+        if self.width is not None and self.height is not None:
+            ratio = min(
+                Fraction(self.width, original_width),
+                Fraction(self.height, original_height)
+            )
+        else:
+            if self.width is None and self.height is not None:
+                ratio = Fraction(self.height, original_height)
+            elif self.width is not None and self.height is None:
+                ratio = Fraction(self.width, original_width)
+            else:
+                return img
 
-        if rect is None:
-            return super().process(img)
+        new_dimensions = (
+            round(original_width * ratio),
+            round(original_height * ratio)
+        )
 
-        # overwrite anchor
-        original_anchor = self.anchor  # type: ignore
-        self.anchor = self._get_new_anchor(img, rect)
-        result = super().process(img)
-        self.anchor = original_anchor
-        return result
+        img = Resize(*new_dimensions, upscale=self.upscale).process(img)
+        if self.mat_color is not None:
+            new_width = (
+                self.width
+                or (
+                    new_dimensions[0]
+                    if self.upscale
+                    else min(original_width, new_dimensions[0])
+                )
+            )
+            new_height = (
+                self.height
+                or (
+                    new_dimensions[1]
+                    if self.upscale
+                    else min(original_height, new_dimensions[1])
+                )
+            )
+
+            img = ResizeCanvas(
+                new_width,
+                new_height,
+                self.mat_color,
+                anchor=self.anchor
+            ).process(img)
+
+        return img

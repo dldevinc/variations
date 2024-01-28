@@ -1,0 +1,231 @@
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport"
+        content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+  <style>
+    body {
+      font-size: 14px;
+    }
+
+    h2 {
+      margin-top: 0;
+    }
+
+    pre {
+      margin: 0;
+      padding: 1rem;
+      white-space: pre-line;
+      background: #eaeaea;
+    }
+
+    img {
+      max-width: 100%;
+      height: auto;
+    }
+
+    small {
+      display: inline-block;
+      margin-top: 0.5em;
+      font-size: 14px;
+    }
+
+    .container {
+      margin-inline: auto;
+      max-width: 95vw;
+    }
+
+    .py-medium {
+      padding-block: 2rem;
+    }
+
+    .grid {
+      display: grid;
+      gap: 1px;
+      grid-template-columns: auto auto;
+      width: fit-content;
+    }
+
+    .left,
+    .right {
+      padding: 2rem;
+      box-shadow: 0 0 0 1px #e0e0e0;
+    }
+
+    .text-muted {
+      color: #a0a0a0;
+    }
+  </style>
+</head>
+<body>
+  <div class="container py-medium">
+    <div class="grid">
+
+      <div class="left">
+        <h2>Original image</h2>
+      </div>
+
+      <div class="right">
+        <img src="./img/source.jpg"
+             width="400"
+             height="266"
+             alt=""
+             decoding="async">
+        <br>
+        <small>400x266</small>
+      </div>
+
+
+      <div class="left">
+        <h2>mode = fill<br>upscale = False <span class="text-muted">(default)</span></h2>
+        <pre>
+          Variation(
+          &nbsp;  size=(320, 320),
+          &nbsp;  mode=Variation.Mode.FILL
+          )
+        </pre>
+      </div>
+
+      <div class="right">
+        <img src="./img/c_lfill.jpg"
+             width="320"
+             height="266"
+             alt=""
+             decoding="async">
+        <br>
+        <small>320x266</small>
+      </div>
+
+
+      <div class="left">
+        <h2>mode = fill<br>upscale = True</h2>
+        <pre>
+          Variation(
+          &nbsp;  size=(320, 320),
+          &nbsp;  mode=Variation.Mode.FILL,
+          &nbsp;  upscale=True
+          )
+        </pre>
+      </div>
+
+      <div class="right">
+        <img src="./img/c_fill.jpg"
+             width="320"
+             height="320"
+             alt=""
+             decoding="async">
+        <br>
+        <small>320x320</small>
+      </div>
+
+      <div class="left">
+        <h2>mode = fit<br>upscale = False <span class="text-muted">(default)</span></h2>
+        <pre>
+          Variation(
+          &nbsp;  size=(320, 320),
+          &nbsp;  mode=Variation.Mode.FIT
+          )
+        </pre>
+      </div>
+
+      <div class="right">
+        <img src="./img/c_limit.jpg"
+             width="320"
+             height="213"
+             alt=""
+             decoding="async">
+        <br>
+        <small>320x213</small>
+      </div>
+
+      <div class="left">
+        <h2>mode = fit<br>upscale = False <span class="text-muted">(default)</span><br>background="aqua"</h2>
+        <pre>
+          Variation(
+          &nbsp;  size=(500, 400),
+          &nbsp;  mode=Variation.Mode.FIT,
+          &nbsp;  background="aqua"
+          )
+        </pre>
+      </div>
+
+      <div class="right">
+        <img src="./img/c_lpad.jpg"
+             width="500"
+             height="400"
+             alt=""
+             decoding="async">
+        <br>
+        <small>500x400</small>
+      </div>
+
+      <div class="left">
+        <h2>mode = fit<br>upscale = True</h2>
+        <pre>
+          Variation(
+          &nbsp;  size=(500, 400),
+          &nbsp;  mode=Variation.Mode.FIT,
+          &nbsp;  upscale=True
+          )
+        </pre>
+      </div>
+
+      <div class="right">
+        <img src="./img/c_fit.jpg"
+             width="500"
+             height="332"
+             alt=""
+             decoding="async">
+        <br>
+        <small>500x332</small>
+      </div>
+
+
+      <div class="left">
+        <h2>mode = fit<br>upscale = True<br>background="aqua"</h2>
+        <pre>
+          Variation(
+          &nbsp;  size=(500, 400),
+          &nbsp;  mode=Variation.Mode.FIT,
+          &nbsp;  upscale=True,
+          &nbsp;  background="aqua"
+          )
+        </pre>
+      </div>
+
+      <div class="right">
+        <img src="./img/c_pad.jpg"
+             width="500"
+             height="400"
+             alt=""
+             decoding="async">
+        <br>
+        <small>500x400</small>
+      </div>
+
+      <div class="left">
+        <h2>mode = crop</h2>
+        <pre>
+          Variation(
+          &nbsp;  size=(150, 200),
+          &nbsp;  mode=Variation.Mode.CROP
+          )
+        </pre>
+      </div>
+
+      <div class="right">
+        <img src="./img/c_crop.jpg"
+             width="150"
+             height="200"
+             alt=""
+             decoding="async">
+        <br>
+        <small>150x200</small>
+      </div>
+
+    </div>
+  </div>
+</body>
+</html>
